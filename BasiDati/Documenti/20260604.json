@@ -1,0 +1,646 @@
+trovare i film del 2010 o 2011 con durata tra 60 e 120 minuti. Ordinare il risultato in base al titolo e mostrare solo titolo, anno e durata dei film 
+
+db.movie.find(
+    {
+    "$and": [
+        {
+            "length": {
+                "$gte": 60
+            }
+        },
+        {
+            "length": {
+                "$lte": 120
+            }
+        }
+    ],
+    "$or": [
+        {
+            "year": "2010"
+        },
+        {
+            "year": "2011"
+        }
+    ]
+},
+{
+    "_id": 1,
+    "title": 1,
+    "year": 1,
+    "length": 1
+}
+).sort(
+    {
+    "length": -1,
+    "title": 1
+}
+).pretty()
+
+alternativa con "$in"
+db.movie.find(
+    {
+    "$and": [
+        {
+            "length": {
+                "$gte": 60
+            }
+        },
+        {
+            "length": {
+                "$lte": 120
+            }
+        }
+    ],
+    "year": {
+        "$in": [
+            "2010",
+            "2011"
+        ] 
+    }
+},
+{
+    "_id": 1,
+    "title": 1,
+    "year": 1,
+    "length": 1
+}
+)
+
+trovare i film dove Leonardo DiCaprio è produttore.
+la seguente soluzione è errata: crew soddisfa la richiesta anche con sotto-elementi separati (film in cui Leonardo compare con qualsiasi ruolo ed esiste un produttore, non necessariamente DiCaprio) 
+db.movie.find(
+    {
+    "crew.give_name": "Leonardo DiCaprio",
+    "crew.role": "producer"
+},
+{
+    "title": 1,
+    "crew.$": 1
+}
+).pretty()
+
+la soluzione corretta richiede $elemMatch
+https: //www.mongodb.com/docs/manual/reference/operator/query/elemMatch/
+db.movie.find(
+    {
+    "crew": {
+        "$elemMatch": {
+            "give_name": "Leonardo DiCaprio",
+            "role": "producer"
+        }
+    }
+},
+{
+    "title": 1,
+    "crew.$": 1
+}
+).pretty()
+
+trovare i film dove tutti i membri della crew hanno il campo character senza valori vuoti. Escludere i film nei quali non esiste l'elemento crew (non ci sono risultati nella collection movie)
+db.movie.find(
+{
+    "$and": [
+        {
+            "crew": {
+                "$exists": true
+            }
+        },
+        {
+            "crew": {
+                "$not": {
+                    "$elemMatch": {
+                        "$or": [
+                            {
+                                "character": {
+                                    "$exists": false
+                                }
+                            },
+                            {
+                                "character": ""
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+},
+{
+    "title": 1,
+    "crew": 1
+}
+).pretty()
+
+anche la soluzione senza $elemMatch è soddisfacente perchè le due condizioni non devono verificarsi in sotto-elementi diversi
+db.movie.find(
+{
+    "$and": [
+        {
+            "crew": {
+                "$exists": true
+            }
+        },
+        "$not": {
+            "$or": [
+                {
+                    "crew.character": {
+                        "$exists": false
+                    }
+                },
+                {
+                    "crew.character": ""
+                }
+            ]
+        }
+    ]
+},
+{
+    "title": 1,
+    "crew": 1
+}
+).pretty()
+
+trovare il numero di film del 2010
+db.movie.find(
+{
+    "year": "2010"
+}).count()
+
+l'esercizio può essere risolto usando la pipeline di aggregation:
+https: //www.mongodb.com/docs/manual/core/aggregation-pipeline/
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "year": "2010"
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "numero film del 2010": {
+                "$sum": 1
+            }
+        }
+    }
+])
+
+trovare il numero di film per ogni anno e ordinare il risultato in base all'anno
+db.movie.aggregate(
+[
+    {
+        "$group": {
+            "_id": "$year",
+            "numero film": {
+                "$sum": 1
+            }
+        }
+    },
+    {
+        "$sort": {
+            "_id": 1
+        }
+    }
+])
+
+trovare gli anni in cui ci sono più di 10 film 
+db.movie.aggregate(
+    [
+    {
+        "$group": {
+            "_id": "$year",
+            "numero film": {
+                "$sum": 1
+            }
+        }
+    },
+    {
+        "$match": {
+            "numero film": {
+                "$gt": 10
+            }
+        }
+    },
+    {
+        "$sort": {
+            "numero film": -1,
+            "_id": 1
+        }
+    }
+])
+
+trovare i film con Leonardo DiCaprio come produttore e contarli anno per anno  
+db.movie.aggregate(
+    [
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "producer"
+                }
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": "$year",
+            "numero film": {
+                "$sum": 1
+            }
+        }
+    },
+    {
+        "$sort": {
+            "numero film": -1,
+            "_id": 1
+        }
+    }
+])
+
+mostrare titolo e anno dei film con DiCaprio come attore
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "title": 1,
+            "year": 1,
+            "length": 1
+        }
+    }
+])
+
+trovare i film in cui recitano come attori DiCaprio e Tom Hardy
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Tom Hardy",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "title": 1,
+            "year": 1,
+            "length": 1
+        }
+    }
+])
+
+trovare la numerosità della crew dei film in cui recita DiCaprio
+$size funziona solo se applicato a array 
+https: //www.mongodb.com/docs/manual/reference/operator/aggregation/size/
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "title": 1,
+            "year": 1,
+            "length": 1,
+            "numerosità crew": {
+                "$size": "$crew"
+            }
+        }
+    }
+])
+
+uso $type per escludere i documenti in cui crew non è array 
+https: //www.mongodb.com/docs/manual/reference/operator/query/type/
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$match": {
+            "crew": {
+                "$type": "array"
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "title": 1,
+            "year": 1,
+            "length": 1,
+            "numerosità crew": {
+                "$size": "$crew"
+            }
+        }
+    }
+])
+
+
+trovare la durata complessiva dei film con DiCaprio come attore
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "durata complessiva": {
+                "$sum": "$length"
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "attore": "Leonardo DiCaprio",
+            "durata complessiva": 1
+        }
+    }
+])
+
+ 
+trovare la durata media dei film con DiCaprio come attore
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "durata media": {
+                "$avg": "$length"
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "attore": "Leonardo DiCaprio",
+            "durata media": 1
+        }
+    }
+])
+
+calcoliamo la media dei film di DiCaprio usando count e sum
+db.movie.aggregate(
+[
+    {
+        "$match": {
+            "crew": {
+                "$elemMatch": {
+                    "give_name": "Leonardo DiCaprio",
+                    "role": "actor"
+                }
+            }
+        }
+    },
+    {
+        "$match": {
+            "length": {
+                "$exists": true
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "durata complessiva": {
+                "$sum": "$length"
+            },
+            "numero film": {
+                "$sum": 1
+            },
+            "durata media": {
+                "$avg": "$length"
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "attore": "Leonardo DiCaprio",
+            "durata media": 1,
+            "durata media con divide": {
+                "$divide": [
+                    "$durata complessiva",
+                    "$numero film"
+                ]
+            }
+        }
+    }
+])
+
+trovare il numero di film in cui DiCaprio è attore 
+soluzione alternativa usando $unwind
+https: //www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/
+db.movie.aggregate(
+[
+    {
+        "$unwind": "$crew"
+    },
+    {
+        "$match": {
+            "crew.give_name": "Leonardo DiCaprio",
+            "crew.role": "producer"
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "numero film": {
+                "$sum": 1
+            }
+        }
+    }
+])
+
+trovare le recensioni prodotte nel mese di novembre 2017
+db.movie.aggregate([
+    {
+        "$match": {
+            "ratings": {
+                "$elemMatch": {
+                    "$and": [
+                        {
+                            "rating_date": {
+                                "$gte": ISODate("2017-11-01")
+                            }
+                        },
+                        {
+                            "rating_date": {
+                                "$lte": ISODate("2017-11-30")
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "$project": { "ratings": 1
+        }
+    }
+])
+
+contare le recensioni prodotte nel mese di novembre 2017
+questa soluzione conta i film con almeno una recensione in novembre 2017. Se un film ha più recensioni in novembre 2017 viene contato una volta sola perchè il documento è uno solo
+db.movie.aggregate([
+    {
+        "$match": {
+            "ratings": {
+                "$elemMatch": {
+                    "$and": [
+                        {
+                            "rating_date": {
+                                "$gte": ISODate("2017-11-01")
+                            }
+                        },
+                        {
+                            "rating_date": {
+                                "$lte": ISODate("2017-11-30")
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "totale recensioni": {
+                "$sum": 1
+            }
+        }
+    }
+])
+
+una soluzione corretta (cioè che conta le recensioni e non i film)
+db.movie.aggregate([
+    {
+        "$unwind": "$ratings"
+    },
+    {
+        "$match": {
+            "$and": [
+                {
+                    "ratings.rating_date": {
+                        "$gte": ISODate("2017-11-01")
+                    }
+                },
+                {
+                    "ratings.rating_date": {
+                        "$lte": ISODate("2017-11-30")
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "$group": {
+            "_id": null,
+            "totale recensioni": {
+                "$sum": 1
+            }
+        }
+    }
+])
+
+query per trovare i documenti con l'elemento ratings
+db.movie.find(
+{
+    "ratings": {
+        "$exists": true
+    }
+},
+{
+    "ratings": 1
+})
+
+trovare il numero di attori per ogni film mostrando anche il titolo nel risultato
+usare sempre l'identificatore degli oggetti nelle aggregazioni. Aggregare solo per il titolo rischia considerare con un unico film anche pellicole che hanno stesso titolo ma id diverso
+db.movie.aggregate(
+[
+    {
+        "$unwind": "$crew"
+    },
+    {
+        "$match": {
+            "crew.role": "actor"
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "movie": "$_id",
+                "title": "$title"
+            },
+            "numero attori": { "$sum": 1
+            }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "titolo": "$_id.title",
+            "numero attori": 1
+        }
+    }
+])

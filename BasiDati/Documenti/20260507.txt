@@ -1,0 +1,97 @@
+Lezione del 20260507
+====================
+
+Consideriamo negli esempi la seguente tabella:
+
+CREATE TABLE imdb.country (
+    id serial,
+    iso3 char(3),
+    name varchar(50),
+    population integer,
+    image bytea
+)
+
+Occupazione di spazio di un record di imdb.country:
+(in base all'occupazione dei tipi di dato di PostgreSQL
+https://www.postgresql.org/docs/current/datatype.html)
+serial - 4 byte 
+char(3) - 3+1 byte 
+varchar(50) - 50+1 byte 
+integer - 4 byte
+bytea - lunghezza variabile (dipende dall'immagine)
+
+il tipo di dato bytea (blob, tipo di dato binario) ha varie strategie di memorizzazione: 
+https://www.postgresql.org/docs/current/datatype-binary.html
+
+
+Ricerca in un file -> query su tabella
+
+-- query puntuale
+SELECT *
+FROM imdb.country
+WHERE iso3 = 'ITA';
+
+-- query con intevallo
+SELECT *
+FROM imdb.country
+WHERE iso3 >= "ALB" AND iso3 <= "ITA";
+
+Esempio 1
+Record di dimensione fissa R = 100 byte
+File con r = 30.000 record e blocchi B = 1024 byte
+Quante voci conterrà l’indice?
+
+bfr = B/R = 1024 / 100 = 10 
+blocchi = 30000 / 10 = 3000
+L'indice primario avrà 3000 voci, una per ogni blocco del file che memorizza la relazione (tabella)
+
+Esempio 2
+I valori della pseudochiave dell’indice occupano 3 byte 
+Il puntatore al blocco è un indirizzo di 6 byte
+Quanti blocchi occupa l’indice?
+
+R (lunghezza del record dell'indice) = 3 + 6 = 9
+bfr = B / R = 1024 / 9 = 113
+blocchi = 3000 / 113 = 26
+
+Esempio su indici secondari
+Consideriamo un file che abbia r = 30.000 record di dimensione R = 100 byte e B = 1024 byte per blocco
+Quanti accessi sarebbero mediamente necessari con una ricerca lineare su un file non ordinato?
+
+Il file occupa 3000 blocchi 
+Se il criterio di memorizzazione primaria è sequenziale non ordinata, la ricerca avviene in modo lineare. Mediamente devo accedere a 1500 blocchi.
+
+Quanti accessi sarebbero necessari con una ricerca binaria assumendo una dimensione di R = 15 byte per ciascuna voce dell’indice?
+
+Un indice secondario sulla pseudochiave di ricerca è denso, quindi una voce dell'indice per ogni valore della pseudochiave.
+
+Quante voci dell'indice? 30000 (una voce per ogni record)
+bfr = B / R = 1024 / 15 = 68
+blocchi = 30000 / 68 = 441 
+
+log2 441 = 9
+
+query esempio su instacart (~200MB in download)
+https://contents.islab.di.unimi.it/datasets/instacart.sql.zip
+
+trovare user_id e dow degli ordini che contengono 'Italian Beer'
+
+explain analyze
+SELECT user_id, order_dow
+FROM orders o INNER JOIN order_products op ON o.order_id = op.order_id INNER JOIN products p ON op.product_id = p.product_id 
+WHERE product_name = 'Italian Beer';
+
+create index on products(product_name);
+
+La query non mostra sostanziali differenze nelle performance con/senza indice sull'attributo product_name.
+
+Tuttavia osservando il piano di esecuzione con explain analyze osserviamo che la scansione della tabella products è diversa (seq. scan senza indice, index scan con indice). 
+
+Nel seguente esempio, si può apprezzare anche una differenza di performance
+
+explain analyze
+SELECT user_id, order_dow
+FROM orders o INNER JOIN order_products op ON o.order_id = op.order_id INNER JOIN products p ON op.product_id = p.product_id 
+WHERE add_to_cart_order = 1;
+
+create index on order_products(add_to_cart_order);

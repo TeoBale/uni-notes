@@ -1,0 +1,259 @@
+appunti della lezione 20260302
+==============================
+
+dato il seguente schema di relazione movie:
+movie(id, title, year, length, genre)
+
+come possiamo rappresentare più efficacemente che un movie può essere associato a diversi genre?
+
+Ecco la soluzione convenzionale. Usiamo 3 tabelle:
+- movie(id, title, year, length)
+- genre(id, nome)
+- movie-genre(movie_id, genre_id)
+
+genre
+=====
+id   || nome
+=============
+001     Comedy
+002     Drama
+...
+
+movie-genre
+===========
+movie_id || genre_id
+=====================
+ABC            001
+BCD            002
+ABC            003
+DFR            001
+
+Questa è una relazione molti-a-molti.
+
+Seguono altre soluzioni basate su un'unica tabella. Ognuna presenta limiti e andrebbe evitata:
+
+soluzione 1: avere un numero di attributi genre pari al numero massimo di generi per ogni pellicola
+movie(id, title, year, length, genre1, genre2, genre3)
+
+soluzione 2: avere un attributo per ogni genre e usare valori true/false per rappresentare quali generi ha ciascun movie
+movie(id, title, year, length, comedy, drama, ...)
+
+
+appunti della lezione 20260304
+==============================
+
+consideriamo l'associazione fra film e recensioni.
+si tratta di un'associazione uno-a-molti.
+
+- movie(id, title, year, length)
+- rating(reviewer, r_date, score, scale, movie_id)
+
+rating
+======
+reviewer | r_date     | score | scale | movie_id
+================================================
+corriere   20260304      3.5     5        ABC
+
+
+Introduzione al modello relazionale
+
+Esempio di relazione di basi di dati nel contesto di una base di dati zoologica
+
+animale(specie, colore)
+
+animale: D1 x D2 
+
+animale è definito come una relazione matematica sul prodotto cartesiano dei domini D1 x D2 
+
+animale ⊆ D1 x D2 
+
+D1 = { gatto, cane }
+D2 = { bianco, nero, marrone }
+
+Possibile istanza della relazione:
+animale
+=======
+specie  | colore
+================
+gatto     nero 
+gatto     bianco
+cane      marrone
+gatto     bianco
+cane      bianco 
+cane      nero 
+  
+
+- grado di una relazione: numero di attributi che la definisce  
+- cardinalità di una relazione: numero di istanze che la costituisce 
+
+La relazione può essere definita posizionalmente sui domini che la costituiscono:
+R(D1, D2) 
+
+La relazione può essere definita assegnando un nome a ciascuno degli attributi
+R(A1, A2)
+
+
+Dato l'insieme di domini (o nomi di attributi)
+D1, D2, ..., Dn 
+A1, A2, ..., An 
+
+La relazione è definita come segue:
+R(D1, D2, ..., Dn)
+R(A1, A2, ..., An) 
+ 
+Definizione di istanza/ennupla/tupla/record di R:
+(d1, d2, ..., dn) 
+
+∀ d_i si ha che d_i ∈ D_i con i ∊ [1, n]
+
+t[A_k] denota il valore della ennupla t sull'attributo A_k 
+
+Lo schema di una base di dati è l'insieme delle relazioni che la compongono
+BD = { R_1, R_2, ..., R_m }
+con R in BD definita come 
+R(A_1, A_2, ..., A_n )
+
+
+Vincoli del modello relazionale
+-------------------------------
+
+1. valori mancanti (null values)
+- è possibile definire un vincolo che impedisce la memorizzazione di valori nulli sugli attributi indicati (NOT NULL) 
+
+-- semantica del valore nullo
+A. valore non noto, ma esistente (data di nascita di un individuo)
+B. valore non esistente (data di decesso di un individuo in vita)
+C. indistinguibilità fra A, B (data di decesso mancante per un individuo del quale non sappiamo se è ancora in vita) 
+
+Sono vincoli di integrità di una relazione R quelle proprietà che devono essere soddisfatte da una ennupla per appartenere alla relazione R
+Sono vincoli di integrità i seguenti:
+2. vincoli di dominio
+3. vincoli di ennupla 
+4. vincoli di superchiave (vincolo di univocità)
+Data la relazione R(A) dove A è l'insieme degli attributi su cui è definita R 
+X ⊆ A è superchiave SK di R se t1[X]≠t2[X] ∀t1, t2 
+
+Esempi di superchiave per la relazione movie
+
+SK: id, official_title, budget, year, length, plot 
+SK, K: id 
+SK, K: plot (assumendo che i remake abbiamo qualche differenza nel plot)
+SK: id, official_title
+SK: id, official_title, length 
+SK: id, official_title, year 
+SK, K: official_title, year (assumendo che non si possano avere due remake dello stesso film nel medesimo anno)
+SK: official_title, year, length 
+
+
+appunti della lezione 20260305
+==============================
+
+- il concetto di chiave
+una chiave K è una superchiave minimale: una superchiave SK è chiave K quando non posso eliminare alcun attributo da SK senza perdere la proprietà di identificazione univoca 
+
+Data la relazione R(A) dove A è l'insieme degli attributi su cui è definita R:
+X ⊆ A è chiave di R se ∄ Y ⊂ X | t1[Y]≠t2[Y] ∀t1, t2
+
+in SQL il vincolo di chiave si esprime con la keyword UNIQUE
+
+Nell'esempio sopra di movie
+UNIQUE(id),
+UNIQUE(plot),
+UNIQUE(official_title, year)
+
+movie 
+=====
+official_title | year
+=====================
+batman           2022
+batman           1978
+batman           [NULL]
+
+Introduciamo il vincolo di entity integrity:
+non è possibile avere valori nulli sull'identificatore di una relazione
+
+La chiave primaria PK di una relazione è una chiave che supporta il vincolo di entity integrity 
+
+Una relazione ha 1 e una sola (1!) chiave primaria 
+
+il vincolo SQL PRIMARY KEY permette di definire la chiave primaria di una relazione
+
+PRIMARY KEY(id) - sussume i vincoli NOT NULL e UNIQUE 
+
+Esempi
+person(id, given_name, bio, birth_date, death_date)
+
+K, PK: id
+K: bio
+SK: given_name, bio, birth_date, death_date
+K: given_name, birth_date, death_date
+
+Altro esempio:
+country(iso3, name)
+
+K, PK: iso3
+K: name 
+
+ALtro esempio:
+crew(person, movie, p_role, character)
+assumiamo che un attore non possa interpretare più personaggi nel medesimo film 
+K, PK: person, movie, p_role    
+
+
+crew
+====
+person | movie | p_role | character
+===================================
+0001     ABC     dir.      
+0001     ABC     act.      Bill 
+0002     BCD     dir.      
+0002     BCD     pro.      
+0001     ABC     act.      Arthur 
+
+Altro possibile modello:
+Ho una relazione crew per rappresentare registi, produttori, scrittori dove la combinazione di person, movie, role è PK
+crew(person, movie, role)
+
+Ho una relazione cast per gli attori dove person, movie, character è PK e un attore può interpretare più personaggi nello stesso film 
+cast(person, movie, character)
+
+Altro esempio:
+genre(movie, genre) 
+
+K, PK: movie, genre 
+
+
+vincoli integrità referenziale
+==============================
+R1(A,B)
+R2(C,D) 
+
+A, B, C, D sono insiemi di attributi 
+UNIQUE(A)
+UNIQUE(C)
+
+Definiamo D chiave esterna di R2 su R1 se R2(D) -> R1(A)
+
+R2 è detta relazione referenziante 
+R1 è detta relazione referenziata
+
+esempi di chiavi esterne:
+crew.person -> person.id
+crew.movie -> movie.id
+genre.movie -> movie.id 
+
+i valori di una chiave esterna (attributo referenziante) devono essere presenti fra i valori dell'attributo referenziato 
+
+la chiave esterna deve avere lo stesso dominio dell'attributo referenziato 
+
+l'attributo referenziato da una chiave esterna deve essere una chiave nella relazione referenziata 
+
+Nella definizione della tabella R2 il vincolo SQL è:
+FOREIGN KEY (D) REFERENCES R1(A) 
+
+sintassi alternativa (quando il vincolo è definito con l'attributo D)
+D REFERENCES R1(A) 
+
+cosa succede se elimino un record da R1 tabella referenziata? rischio di creare inconsistenza dei dati se esistono record di R2 che referenziano il record eliminato. Il DBMS impedisce questa violazione annullando la cancellazione 
+
+gli eventi di modifica (update) della chiave R1.A o cancellazione (delete) sui dati di R1 richiede la verifica dell'integrità referenziale sulle chiavi esterne che referenziano R1 

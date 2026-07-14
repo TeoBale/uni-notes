@@ -1,0 +1,138 @@
+====================
+Lezione del 20260521
+==================== 
+
+/* operatori di MongoDB che vedremo:
+$gt, $gte, $lt, $lte
+$eq, $ne 
+$in, $nin
+$and, $or
+$exist
+$elemMatch
+*/
+/* trova le pellicole del 2010 con durata superiore a 120 minuti */
+db.movie.find(
+{
+    year: '2010',
+    length: {
+        "$gt": 120
+    }
+});
+
+/* trova le pellicole di durata compresa fra 60 e 120 minuti */
+/* soluzione errata */
+db.movie.find(
+{
+    length: {
+        "$gte": 60
+    },
+    length: {
+        "$lte": 120
+    }
+});
+
+db.movie.find(
+{
+    "$and": [
+        { length: {
+                "$gte": 60
+            }
+        },
+        { length: {
+                "$lte": 120
+            }
+        }
+    ]
+});
+
+/* soluzione equivalente alla precedente */
+db.movie.find(
+{
+    length: {
+        "$gte": 60,
+        "$lte": 120
+    },
+});
+
+/* trovare le pellicole prodotte negli anni 2010, 2012, 2014 */
+db.movie.find(
+{
+    year: {
+        "$in": [ '2010', '2012', '2014'
+        ]
+    }
+});
+
+/* trovare le pellicole prodotte in anni diversi da 2010 e 2012 */
+db.movie.find(
+{
+    year: {
+        "$nin": [ '2010', '2012'
+        ]
+    }
+},
+{
+    _id: 0,
+    movie_id: 1,
+    title: 1,
+    year: 1
+});
+
+
+/* trovare le pellicole che non sono del 2010 e hanno durata superiore a 120. Ordinare il risultato in base all'anno (crescente) e al titolo (decrescente) */
+db.movie.find(
+{
+    "year": {
+        "$ne": '2010'
+    },
+    "length": {
+        "$gt": 120
+    }
+},
+{
+    _id: 0,
+    movie_id: 1,
+    title: 1,
+    year: 1
+}).sort({ year: 1, title: -1
+});
+
+/* trovare le pellicole che hanno almeno una persona nella crew che non è attore */ 
+db.movie.find(
+{
+    "crew.role": {
+        "$ne": 'actor'
+    }
+},
+{
+    title: 1,
+    year: 1,
+    "crew.role.$": 1
+})
+
+/* trovare le pellicole dove tutte le persone sono attori */
+db.movie.find(
+{
+    $and: [
+        {
+            "crew.role": {
+                "$ne": 'director'
+            }
+        },
+        {
+            "crew.role": {
+                "$ne": 'writer'
+            }
+        },
+        {
+            "crew.role": {
+                "$ne": 'producer'
+            }
+        }
+    ]
+},
+{
+    title: 1,
+    year: 1,
+    crew: 1
+})

@@ -1,0 +1,28 @@
+{
+	"nodes":[
+		{"id":"a53870edee91088d","type":"text","text":"# Realtà di interesse\nAzienda con delle necessità","x":-160,"y":-400,"width":278,"height":120},
+		{"id":"639b399738bb0e0d","type":"text","text":"## Raccolta requisiti\nProduzione di documentazione relativa alle specifiche del progetto","x":-146,"y":-220,"width":250,"height":160},
+		{"id":"f6c87225d9227360","type":"text","text":"### Progettazione concettuale\nProduzione schema er","x":180,"y":20,"width":250,"height":120},
+		{"id":"38ca73a9f7701da9","type":"text","text":"### Progettazione logica\nEs: schema logico relazione","x":180,"y":220,"width":250,"height":115},
+		{"id":"d61c3dbf5c9d295b","type":"text","text":"### Progettazione fisica\nCome verranno effetivamente memorizzati i dati","x":180,"y":420,"width":250,"height":128},
+		{"id":"6405683db22afd85","type":"text","text":"### Analisi funzionale\nAnalisi delle necessità funzionali dell'applicativo","x":-480,"y":20,"width":250,"height":120},
+		{"id":"2121b02fdc4da8fe","type":"text","text":"### Progettazione applicazioni\nIndipendentemente dal DBMS","x":-480,"y":220,"width":250,"height":115},
+		{"id":"5b745d23a0a07b26","type":"text","text":"### Implementazione delle transazioni\nDipende dal DBMS","x":-480,"y":420,"width":250,"height":128},
+		{"id":"05bdb7ad3b6cdcb9","type":"file","file":"BasiDati/assets/SchemaEr.png","x":360,"y":-458,"width":528,"height":398},
+		{"id":"b38bc63435940b8c","type":"file","file":"BasiDati/assets/Gerarchie.png","x":40,"y":700,"width":1291,"height":680}
+	],
+	"edges":[
+		{"id":"90a0f6ed6844b5ce","fromNode":"a53870edee91088d","fromSide":"bottom","toNode":"639b399738bb0e0d","toSide":"top"},
+		{"id":"a9ff9f20a53a2bbb","fromNode":"f6c87225d9227360","fromSide":"bottom","toNode":"38ca73a9f7701da9","toSide":"top"},
+		{"id":"5b871d0f02f0a68f","fromNode":"38ca73a9f7701da9","fromSide":"bottom","toNode":"d61c3dbf5c9d295b","toSide":"top"},
+		{"id":"1957f2b1404dccaf","fromNode":"639b399738bb0e0d","fromSide":"bottom","toNode":"f6c87225d9227360","toSide":"top"},
+		{"id":"483bd236ea4922fe","fromNode":"6405683db22afd85","fromSide":"bottom","toNode":"2121b02fdc4da8fe","toSide":"top"},
+		{"id":"e0506e55da692e76","fromNode":"2121b02fdc4da8fe","fromSide":"bottom","toNode":"5b745d23a0a07b26","toSide":"top"},
+		{"id":"1c665973501a8ddd","fromNode":"639b399738bb0e0d","fromSide":"bottom","toNode":"6405683db22afd85","toSide":"top"},
+		{"id":"811c718d25f1d60a","fromNode":"d61c3dbf5c9d295b","fromSide":"left","toNode":"5b745d23a0a07b26","toSide":"right"},
+		{"id":"b265867bc9939faa","fromNode":"6405683db22afd85","fromSide":"right","toNode":"d61c3dbf5c9d295b","toSide":"left","color":"1"},
+		{"id":"21da019be9f582ef","fromNode":"38ca73a9f7701da9","fromSide":"left","toNode":"2121b02fdc4da8fe","toSide":"right"},
+		{"id":"75cde2b8321bafbe","fromNode":"f6c87225d9227360","fromSide":"right","toNode":"05bdb7ad3b6cdcb9","toSide":"bottom"},
+		{"id":"82345180f9db522a","fromNode":"f6c87225d9227360","fromSide":"right","toNode":"b38bc63435940b8c","toSide":"top"}
+	]
+}
