@@ -1,0 +1,8 @@
+# Obsidian system/device-specific files
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# Operating System files
+.DS_Store
+Thumbs.db
+*.local
