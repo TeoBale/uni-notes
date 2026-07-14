@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "f85ba25068e998fd",
+        "id": "2b665fac5946d96d",
         "type": "tabs",
         "children": [
           {
-            "id": "b306ff56311e7f73",
+            "id": "325f44c893e3db12",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -190,23 +190,25 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "d77cf37cf1b1ca29",
+  "active": "325f44c893e3db12",
   "lastOpenFiles": [
-    "BasiDati/Documenti/202603.1.txt",
-    "Untitled.base",
+    "BasiDati/Documenti/MongoDB/20260521.json",
+    "BasiDati/Documenti/MongoDB",
+    "BasiDati/Documenti/SQL/21-05-2026.sql",
+    "BasiDati/Documenti/SQL/14-05-2026.sql",
+    "BasiDati/Documenti/SQL/05-03-2026.sql",
+    "BasiDati/Documenti/SQL/04-03-2026.sql",
+    "BasiDati/Documenti/SQL/03-03-2026.sql",
+    "BasiDati/Documenti/Algebra Relazionale/07-05-2026.txt",
+    "BasiDati/Documenti/Algebra Relazionale/02-03-2026.txt",
+    "BasiDati/Documenti/Algebra Relazionale/01-03-2026.txt",
+    "BasiDati/Documenti/SQL",
+    "Uni-Notes.md",
     "BasiDati/assets/Gerarchie.png",
-    "BasiDati/Documenti/20260604.json",
-    "BasiDati/Documenti/20260507.txt",
-    "BasiDati/Documenti/202603.2 (aggiornato il 20260316).txt",
-    "BasiDati/Documenti/Progettazione Logica/normalizzazione.pdf",
     "BasiDati/Note SQL.md",
-    "BasiDati/Documenti/Progettazione Logica",
     "BasiDati/Normalizzazione.md",
     "BasiDati/Ambiente di lavoro.md",
     "BasiDati/Progettazione Logica.md",
-    "BasiDati/Documenti/Progettazione Logica/progettazione.2.pdf",
-    "BasiDati/Documenti/Progettazione Logica/progettazione.3.pdf",
-    "BasiDati/Documenti/Progettazione Logica/progettazione.1.pdf",
     "BasiDati/Note.md",
     "BasiDati/Progettazione concettuale.canvas",
     "BasiDati/Progettazione Fisica.md",
@@ -236,7 +238,6 @@
     "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
     "copilot/copilot-custom-prompts/Rewrite as tweet.md",
     "copilot/copilot-custom-prompts/Remove URLs.md",
-    "copilot/copilot-custom-prompts/Generate glossary.md",
-    "copilot/copilot-custom-prompts/Generate table of contents.md"
+    "copilot/copilot-custom-prompts/Generate glossary.md"
   ]
 }
