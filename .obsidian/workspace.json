@@ -11,10 +11,14 @@
             "id": "325f44c893e3db12",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "README"
             }
           }
         ]
@@ -192,18 +196,18 @@
   },
   "active": "325f44c893e3db12",
   "lastOpenFiles": [
+    "BasiDati/Documenti/MongoDB/21-05-2026.json",
+    "BasiDati/Documenti/MongoDB/04-06-2026.json",
+    "BasiDati/Documenti/SQL/21-05-2026.txt",
+    "BasiDati/Documenti/SQL/14-05-2026.txt",
+    "BasiDati/Documenti/SQL/05-03-2026.txt",
+    "BasiDati/Documenti/SQL/04-03-2026.txt",
+    "BasiDati/Documenti/SQL/03-03-2026.txt",
     "BasiDati/Documenti/MongoDB/20260521.json",
     "BasiDati/Documenti/MongoDB",
     "BasiDati/Documenti/SQL/21-05-2026.sql",
     "BasiDati/Documenti/SQL/14-05-2026.sql",
-    "BasiDati/Documenti/SQL/05-03-2026.sql",
-    "BasiDati/Documenti/SQL/04-03-2026.sql",
-    "BasiDati/Documenti/SQL/03-03-2026.sql",
-    "BasiDati/Documenti/Algebra Relazionale/07-05-2026.txt",
-    "BasiDati/Documenti/Algebra Relazionale/02-03-2026.txt",
-    "BasiDati/Documenti/Algebra Relazionale/01-03-2026.txt",
-    "BasiDati/Documenti/SQL",
-    "Uni-Notes.md",
+    "README.md",
     "BasiDati/assets/Gerarchie.png",
     "BasiDati/Note SQL.md",
     "BasiDati/Normalizzazione.md",
