@@ -1,0 +1,224 @@
+Lezione del 20260430
+====================
+
+La teoria della normalizzazione sancisce principi di qualità per gli schemi di basi di dati che progettiamo
+
+obiettivi:
+- ridurre i valori nulli
+- ridurre la ridondanza dei dati 
+
+principi di buona progettazione:
+- un singolo oggetto (istanza) deve corrispondere a una e una sola tupla
+- una classe di oggetti con le medesime proprietà deve corrispondere a un'unica relazione/tabella
+- le relazioni devono legarsi fra di loro evitando di generare corrispondenze scorrette in fase di join 
+- utilizzare attributi con valori atomici
+
+
+
+Esempio di relazione (esempio R1)
+la relazione descrive gli attori e i film in cui recitano con indicazione del personaggio che interpretano. Assumiamo che una persona non possa recitare più volte nel medesimo film
+ 
+R1(person, first_name, last_name, given_name, movie, title, year, character)
+Key: person, movie 
+
+Dipendenze funzionali (DF):
+person -> first_name, last_name
+person -> given_name
+movie -> title
+movie -> year 
+movie, person -> character 
+
+Inferenza di DF
+
+Regola riflessiva (X ⊇ Y ⊨ X → Y)
+esempio: movie, title -> title 
+
+Regola di arricchimento: ({X → Y}  ⊨  XZ → YZ)
+esempio: movie, year -> title, year 
+
+Regola transitiva: ({X→Y, Y →Z}  ⊨  X → Z)
+
+Regola di decomposizione: ({X → YZ} ⊨ X → Y, X → Z)
+esempio: person -> first_name
+esempio: person -> last_name
+
+Regola di unione: ({X→Y, X→Z} ⊨ X→YZ)
+esempio: movie -> title, year
+esempio: person -> first_name, last_name, given_name 
+
+Regola pseudo-transitiva: ({X→Y, WY → Z} ⊨ WX → Z)
+
+
+La normalizzazione porta alla decomposizione di una relazione iniziale R in base alle dipendenze funzionali F individuate.
+
+La decomposizione di una relazione R porta a un insieme di schemi di relazioni R1, R2, ...Rn che garantiscano due proprietà:
+- lossles join (join senza perdita e senza addività)
+- conservazione delle dipendenze funzionali individuate 
+
+Forme normali FN (normal forms NF)
+- Boyce-Codd NF (BCNF)
+- 3NF 
+- 2NF 
+- 1NF
+
+- uno schema di relazione R può sempre essere ricondotto in 3NF.
+- non è sempre possibile arrivare in BCNF
+
+
+Forma normale BCNF
+consideriamo la R1 sopra
+R1(person, first_name, last_name, given_name, movie, title, year, character)
+
+R1 Key: person, movie 
+
+person -> first_name, last_name
+person -> given_name
+movie -> title
+movie -> year 
+movie, person -> character 
+
+Decomposizione
+RA(person, first_name, last_name, given_name) - key: person
+RC(movie, title, year) - key: movie
+RE(movie, person, character) - key: movie, person
+
+La decomposizione conserva le dipendenze (per ogni dipendenza DF abbiamo una relazione che contiene tutti gli attributi di DF)
+
+Verifichiamo la condizione di lossless join usando la seguente regola:
+
+Sia X l'insieme di attributi di una relazione R e X1, X2 sottoinsiemi tali che X1∪X2 = X e X1∩X2 = X0
+La relazione R si decompone senza perdita in R1(X1) e R2(X2) se X0 è chiave in X1 o X2 
+
+Consideriamo la decomposizione di R1 in RA, RC, RE.
+La decomposizione è lossless perchè il join naturale ricostruisce la relazione di partenza R1:
+RA * RC * RC 
+
+
+Esempio R2
+La relazione descrive una persona e i film in cui ha partecipato. Country rappresenta la sede della produzione del film e coincide con il paese di residenza della persona durante le riprese.
+
+R2(person, movie, country)
+Key: person, movie 
+
+person -> country
+movie -> country 
+
+RA(person, country) - key: person 
+RB(movie, country) - key: movie 
+
+questa decomposizione viola la condizione di lossless join: 
+
+RA∪RB = R2 
+RA∩RB = country (non è chiave in RA e RB)
+
+RA 
+person | country 
+CB        GBR
+MC        USA
+LC        USA
+
+RB 
+movie  | country 
+TM        GBR
+In        USA
+Dark      USA
+GG        USA
+
+RA * RB 
+person  | movie  | country 
+CB          TM      GBR
+MC          In      USA
+MC          Dark    USA 
+MC          GG      USA -- questa tupla non esisteva nella relazione iniziale
+...
+
+
+altra decomposizione:
+RA(person, movie) - key: person, movie
+RB(movie, country) - key: movie 
+
+questa decomposizione non conserva la dipendenza: person -> country
+
+altra decomposizione (coerente con BCNF):
+RA(person, movie) - key: person,movie
+RB(movie, country) - key: movie 
+RC(person, country) - key: person 
+
+
+Esempio R3
+La relazione descrive film, paesi nei quali sono distribuiti e agenzie di distribuzione 
+R3(movie, country, agency)
+key: movie, country
+
+movie, country -> agency 
+agency -> country 
+
+La relazione è in 3NF e non può essere portata in BCNF perchè la dipendenza 
+(movie, country -> agency) coinvolge tutti gli attributi di R3 e qualunque decomposizione non potrebbe conservarla 
+
+
+Esempio R4
+la relazione descrive le persone che lavorano nei film e la data di nascita degli attori 
+R4(person, movie, birthdate)
+key: person, movie 
+
+person -> birthdate 
+person, movie -> birthdate 
+
+birthdate dipende da una parte della chiave. La relazione R4 è in 1NF.
+
+Come decomporre R4 per elevare la qualità (normalizzazione in 2NF). 
+data una chiave primaria composta X, decomporre R realizzando una relazione che conservi X e, per ogni dipendenza parziale (X − A) → Y , una distinta relazione con schema (X − A) ∪ Y e chiave primaria X − A
+
+RA(person, birthdate) - key: person
+RB(person, movie) - key: movie, person 
+
+La decomposizione finale non è solo in 2NF, è in BCNF
+
+
+Esempio R5
+La relazione mostra le persone e i corrispondenti luoghi di nascita in termini di città e paese 
+R5(person, city, country)
+key: person 
+
+person -> city
+city -> country 
+
+RA(person, city) - key: person 
+RB(city, country) - key: city
+
+La forma normale finale è BCNF 
+
+
+Esempio R6 
+La relazione mostra squadre di calcio con corrispondente allenatore, città di riferimento della squadra e relativi giocatori 
+R6(squadra, allenatore, città, giocatore)
+key: giocatore 
+
+squadra -> città 
+squadra -> allenatore 
+allenatore -> squadra 
+
+per transitività abbiamo anche:
+allenatore -> città 
+
+Forma normale di partenza? 2NF 
+RA(squadra, città) - key: squadra
+RB(squadra, allenatore) - key: squadra (allenatore è candidate key) 
+RC(giocatore, squadra) - key: giocatore 
+
+Siamo arrivati in BCNF 
+
+Valutiamo quest'altra decomposizione: 
+RA(squadra, città, allenatore) - key: squadra (allenatore è candidate key) 
+RC(giocatore, squadra) - key: giocatore 
+
+squadra -> città 
+squadra -> allenatore 
+allenatore -> squadra 
+
+Anche questa decomposizione è in BCNF 
+
+Nel diagramma ER pubblicato con questi appunti, si può osservare un possibile modello concettuale da cui origina R6.
+Nel file, si può anche osservare un modello concettuale alternativo e più accurato. Da questo modello alternativo originano i due schemi relazionali ottenuti con la normalizzazione.
+Questo significa che progetti concettuali ben fatti portano a schemi relazionali normalizzati di buona qualità.

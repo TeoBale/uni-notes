@@ -113,16 +113,13 @@ Amministrazione dei privilegi è decentralizzata mediante ownership:
 	Chi crea la relazione ne possiede i privilegi e possiede la capacità di concederli ad altri.
 
 ```sql
-GRANT Lista Privilegi | ALL [PRIVILEGES] ON Lista
-
-Relazioni | Lista Viste TO Lista Utenti | PUBLIC [WITH
-
-GRANT OPTION]
+GRANT Lista Privilegi | ALL [PRIVILEGES] ON Lista 
+Relazioni | Lista Viste TO Lista Utenti | PUBLIC 
+[WITH GRANT OPTION]
 ```
 
 ```sql
 REVOKE Lista Privilegi | ALL [PRIVILEGES] ON Lista
-
 Relazioni | Lista Viste FROM Lista Utenti | PUBLIC
 ```
 

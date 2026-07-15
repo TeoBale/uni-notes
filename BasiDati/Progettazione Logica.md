@@ -26,7 +26,6 @@
 		
 	- Mantenimento di tutte le entità
 		Tutte le entità figlie vengono conservate come entità separate in relazione all'entità padre
----
 
 **Associazione di tipo storico**:
 definisce un periodo di tempo in cui avviene la relazione.

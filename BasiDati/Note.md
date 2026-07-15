@@ -1,3 +1,2 @@
 - Ripassare esercizi su indici primari e secondari per filtro
-- Finire  Strutture ad accesso sequenziale in  [[Progettazione Fisica]]
 - Indici in sql

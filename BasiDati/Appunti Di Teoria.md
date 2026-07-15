@@ -141,7 +141,12 @@ Base di dati  -> Collezione di dati gestita da un DBMS
 - **Developer**:
 	Interazione con DML
 - **Occasional User**:
-	Utenza che compie attività non standard
+	Utenza che compie attività non standardù
+#### Differenza principale
+- Il **DBA** amministra il sistema.
+- Il **developer** costruisce applicazioni che utilizzano il database.
+- L’**occasional user non esperto** usa funzioni già predisposte.
+- Il **casual user** consulta i dati in maniera più autonoma e variabile.
 
 ---
 ## Accesso ad un DBMS

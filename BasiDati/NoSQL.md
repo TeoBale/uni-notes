@@ -20,13 +20,28 @@
 ---
 # Main features
 
-**Horizontal scalability**
-- **NoSQL DBs** sono progettai per scalare orizzontalmente, o meglio che il sistema può espandersi durante il suo funzionamento aggiungendo più nodi di storage al aumentare dei dati
+### Horizontal scalability
 
-#### **Availability, Replication**
-- NoSQL DBs hanno un particolare rapporto tra numero di copie (per migliorare le prestazioni in lettura) e tempi e complessità della scrittura (aumentano all'aumentare delle copie)
+- I database NoSQL sono generalmente progettati per scalare **orizzontalmente**.
+- Il sistema può essere espanso mentre è operativo aggiungendo nuovi nodi che forniscono capacità di **memorizzazione** e di **elaborazione**, all’aumentare del volume dei dati.
+- La scalabilità orizzontale si contrappone alla scalabilità verticale, che consiste nel potenziare una singola macchina.
+### Availability and Replication
 
-#### **Eventual consistency**
+- I database NoSQL utilizzano la **replica dei dati** per aumentare la disponibilità del sistema.
+- La presenza di più copie degli stessi dati può migliorare le prestazioni delle operazioni di lettura, poiché le richieste possono essere distribuite tra più nodi.
+- All’aumentare del numero di copie, le operazioni di scrittura diventano generalmente più complesse, perché gli aggiornamenti devono essere propagati alle diverse repliche.
+### Horizontal fragmentation
+
+- I dati possono essere suddivisi orizzontalmente in diverse partizioni, chiamate **shard**. Questa tecnica prende il nome di **data sharding**.
+- Ogni shard contiene un sottoinsieme dei record ed è memorizzato su uno o più nodi, permettendo di distribuire il carico di accesso ai dati.
+- Una combinazione appropriata di **sharding** e **replica degli shard** può migliorare il bilanciamento del carico e la disponibilità del sistema.
+### Eventual consistency
+
+- Molti database NoSQL adottano una forma di consistenza più rilassata chiamata **eventual consistency**, detta anche **optimistic replication**.
+- Dopo un aggiornamento, le diverse repliche possono temporaneamente contenere valori differenti.
+- Se non vengono effettuati ulteriori aggiornamenti, le modifiche vengono progressivamente propagate e tutte le repliche convergono infine verso lo stesso valore.
+- Questo modello può migliorare le prestazioni e la disponibilità delle operazioni di scrittura, accettando però la possibilità di leggere temporaneamente dati non aggiornati.
+
 - NoSQL DBs forma più "rilassata" di consistenza chiamata _eventual consistency_
 
 	Esempio di eventual consistency
@@ -36,10 +51,6 @@
 	-  User C tells User D that the weather is going to be sunny
 	-  User B tells User C that the weather is going to rain
 	-  User C tells User D that the weather is going to rain
-
-#### **Horizontal fragmentation**
-- NoSQL data file possono avere diversi milioni di record essendo che i record vengono divisi in diverse partizioni _(data sharding, distribuiti orizzontalmente)_
-- Più copie di una partizione permettono un improvement nelle performance di lettura _(load balancing)_
 
 #### **Schema is not required**
 - I dati descrivono se stessi, può esserci uno schema ma rimane opzionale

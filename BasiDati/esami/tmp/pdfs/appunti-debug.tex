@@ -1,0 +1,1136 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\documentclass[
+  10pt,
+  a4paper,
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Arial}
+  \setsansfont[]{Arial}
+  \setmonofont[]{/Users/teobale/Library/Fonts/JetBrainsMonoNL-Regular.ttf}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{setspace}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setlength{\emergencystretch}{3em}
+\widowpenalty=10000
+\clubpenalty=10000
+\makeatletter
+\g@addto@macro\verbatim\small
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdftitle={Basi di dati - Appunti mirati all'esame},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Basi di dati - Appunti mirati all'esame}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Sintesi exam-first basata sugli appelli 2024-2025}
+\author{}
+\date{Giugno 2026}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\setstretch{1.06}
+Questi appunti sono costruiti sui cinque appelli disponibili
+(16/07/2024, 14/01/2025, 10/06/2025, 01/07/2025, 22/07/2025). Il
+programma del corso è usato per chiarire e completare ciò che compare
+nelle prove, non per assegnare la stessa importanza a ogni argomento.
+
+Per gli svolgimenti completi si veda \url{SOLUZIONI_APPELLI.md}.
+
+\section{1. Cosa studiare prima}\label{1-cosa-studiare-prima}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lrr@{}}
+\toprule\noalign{}
+Argomento & Presenza nei 5 appelli & Priorità \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+SQL (join, negazione, aggregazione, massimo, divisione) & 5/5 &
+massima \\
+Algebra relazionale & 5/5 & massima \\
+ER, traduzione e reverse engineering & 5/5 & massima \\
+Vincoli SQL, chiavi, \texttt{NULL}, effetti delle modifiche & 5/5 &
+massima \\
+Normalizzazione & 5/5 & alta \\
+Sicurezza, \texttt{GRANT}/\texttt{REVOKE} & 5/5 & alta \\
+Transazioni e proprietà ACID & 3/5 & media-alta \\
+File e indici & 3/5 & media-alta \\
+Trigger, viste, PL/pgSQL, NoSQL/MongoDB & 0/5 & bassa, ripasso finale \\
+\end{longtable}
+}
+
+Negli appelli estivi 2025 l\textquotesingle esercizio 1 vale 8 punti ed
+è una \textbf{soglia}: se non si raggiungono tutti gli 8 punti, il resto
+può non essere corretto. Va quindi preparato come una batteria di
+risposte brevi e molto precise.
+
+\section{2. Strategia per i 90
+minuti}\label{2-strategia-per-i-90-minuti}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Leggere DDL, chiavi, \texttt{NOT\ NULL}, azioni
+  \texttt{ON\ DELETE/UPDATE} e annotare le FK.
+\item
+  Svolgere con calma l\textquotesingle esercizio-soglia; controllare
+  soprattutto \texttt{NULL}, join esterni, duplicati e vincoli impliciti
+  della chiave primaria.
+\item
+  Fare prima le query SQL riconducibili a un pattern noto.
+\item
+  Scrivere l\textquotesingle algebra con relazioni intermedie e
+  ridenominazioni esplicite.
+\item
+  Disegnare ER/logico e teoria breve con definizioni, non con esempi
+  vaghi.
+\item
+  Lasciare almeno 8-10 minuti per verificare alias, \texttt{GROUP\ BY},
+  casi a zero e direzione delle chiavi esterne.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte I - Modello relazionale, DDL e domande rapide
+
+\section{3. Relazione, schema e
+istanza}\label{3-relazione-schema-e-istanza}
+
+\begin{itemize}
+\tightlist
+\item
+  Una relazione è un insieme di tuple su domini atomici.
+\item
+  \textbf{Grado}: numero di attributi.
+\item
+  \textbf{Cardinalità}: numero di tuple dell\textquotesingle istanza.
+\item
+  L\textquotesingle ordine di righe e colonne non ha significato nel
+  modello relazionale.
+\item
+  Nel modello relazionale puro non esistono tuple duplicate; SQL,
+  invece, usa normalmente semantica a multinsieme e può produrre
+  duplicati.
+\end{itemize}
+
+\section{4. Superchiave, chiave e chiave
+primaria}\label{4-superchiave-chiave-e-chiave-primaria}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Superchiave}: insieme di attributi che identifica univocamente
+  ogni tupla.
+\item
+  \textbf{Chiave candidata}: superchiave minimale. Togliendo un
+  attributo perde l\textquotesingle unicità.
+\item
+  \textbf{Chiave primaria}: una chiave candidata scelta come
+  identificatore principale. È unica per tabella e implica
+  \texttt{UNIQUE} e \texttt{NOT\ NULL}.
+\item
+  Una superchiave non minimale si ottiene aggiungendo attributi a una
+  chiave: se \texttt{code} è PK, \texttt{\{code,\ air\_company\}} è una
+  superchiave ma non una chiave.
+\item
+  \textbf{Attributo primo}: attributo che appartiene ad almeno una
+  chiave candidata.
+\end{itemize}
+
+Attenzione: \texttt{UNIQUE} non equivale sempre a \texttt{PRIMARY\ KEY},
+perché in SQL può ammettere valori nulli; la PK non li ammette.
+
+\section{5. Chiavi esterne e integrità
+referenziale}\label{5-chiavi-esterne-e-integrituxe0-referenziale}
+
+Una FK \texttt{R.X\ REFERENCES\ S.Y} impone che ogni valore non nullo di
+\texttt{R.X} compaia nel campo candidato referenziato \texttt{S.Y}.
+
+\begin{itemize}
+\tightlist
+\item
+  La FK è nullable se non ha \texttt{NOT\ NULL} e non appartiene a una
+  PK.
+\item
+  Gli attributi di una PK composta sono tutti implicitamente
+  \texttt{NOT\ NULL}.
+\item
+  Se non è specificata un\textquotesingle azione,
+  \texttt{ON\ DELETE/UPDATE} è normalmente \texttt{NO\ ACTION}:
+  l\textquotesingle operazione che spezzerebbe i riferimenti viene
+  rifiutata.
+\item
+  \texttt{CASCADE}: propaga eliminazione o aggiornamento alle tuple
+  referenzianti.
+\item
+  \texttt{SET\ NULL}: mette a \texttt{NULL} la FK; è possibile solo se
+  la colonna è nullable.
+\end{itemize}
+
+Un\textquotesingle istruzione è atomica. Se un \texttt{DELETE} attiva un
+\texttt{CASCADE} su una tabella ma viola una FK \texttt{NO\ ACTION} su
+un\textquotesingle altra, fallisce \textbf{l\textquotesingle intera
+istruzione}: non resta neppure la cancellazione in cascata parziale.
+
+\section{\texorpdfstring{6. \texttt{NULL}, \texttt{CHECK} e lettura del
+DDL}{6. NULL, CHECK e lettura del DDL}}\label{6-null-check-e-lettura-del-ddl}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{NULL} significa valore mancante; \texttt{NULL\ =\ NULL} non è
+  vero ma \texttt{UNKNOWN}.
+\item
+  Si testa con \texttt{IS\ NULL} / \texttt{IS\ NOT\ NULL}, mai con
+  \texttt{=\ NULL}.
+\item
+  Una condizione \texttt{WHERE} conserva solo le righe per cui il
+  predicato è \texttt{TRUE}.
+\item
+  Un \texttt{CHECK} è violato solo quando è \texttt{FALSE};
+  \texttt{TRUE} e \texttt{UNKNOWN} passano. Per vietare il nullo serve
+  anche \texttt{NOT\ NULL}.
+\item
+  Una stringa vuota \texttt{\textquotesingle{}\textquotesingle{}} non è
+  \texttt{NULL} in PostgreSQL.
+\item
+  Non inventare vincoli semantici non presenti nel DDL. Per esempio,
+  \texttt{expiry\_date\ \textless{}\ release\_date} è sospetto, ma non
+  viola il DDL se manca il relativo \texttt{CHECK}.
+\end{itemize}
+
+Checklist rapida su un\textquotesingle istanza:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  tipo e dominio;
+\item
+  \texttt{NOT\ NULL} e PK;
+\item
+  unicità di PK/\texttt{UNIQUE};
+\item
+  \texttt{CHECK};
+\item
+  FK, ma solo se è visibile anche la tabella referenziata.
+\end{enumerate}
+
+\section{7. Join esterni: il punto più facile da
+sbagliare}\label{7-join-esterni-il-punto-piuxf9-facile-da-sbagliare}
+
+\begin{verbatim}
+FROM R LEFT JOIN S
+  ON condizione_di_join AND filtro_su_S
+\end{verbatim}
+
+Il filtro nell\textquotesingle{}\texttt{ON} decide quali righe di
+\texttt{S} si abbinano; non elimina le righe di \texttt{R}, che sono
+preservate dal \texttt{LEFT\ JOIN}.
+
+\begin{verbatim}
+FROM R LEFT JOIN S ON ...
+WHERE S.id IS NULL
+\end{verbatim}
+
+è un \textbf{anti-join}: conserva le righe di \texttt{R} senza
+corrispondenza.
+
+Se una riga di \texttt{R} trova due righe di \texttt{S},
+\texttt{SELECT\ R.*} restituisce due copie identiche sotto la semantica
+SQL, a meno di usare \texttt{DISTINCT}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte II - SQL: i pattern che coprono quasi tutte le query
+
+\section{8. Regola generale}\label{8-regola-generale}
+
+Prima di scrivere SQL, determinare:
+
+\begin{itemize}
+\tightlist
+\item
+  una riga del risultato rappresenta che cosa?
+\item
+  quali tabelle servono per filtrare e quali per mostrare attributi?
+\item
+  vanno conservati anche gli oggetti con conteggio zero?
+\item
+  si cercano uno, tutti i massimi, oppure almeno un caso?
+\item
+  il risultato può contenere duplicati?
+\end{itemize}
+
+Negli esempi seguenti \texttt{R} è l\textquotesingle entità principale e
+\texttt{S} contiene associazioni.
+
+\section{9. ``Non esiste'' / ``mai''}\label{9-non-esiste--mai}
+
+Pattern consigliato:
+
+\begin{verbatim}
+SELECT r.*
+FROM R AS r
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM S AS s
+    WHERE s.rid = r.id
+      AND <condizione vietata>
+);
+\end{verbatim}
+
+Include anche gli oggetti senza alcuna riga in \texttt{S}. È il pattern
+di:
+
+\begin{itemize}
+\tightlist
+\item
+  clienti che non hanno ordini in spedizione;
+\item
+  clienti che non hanno mai preso libri romantici;
+\item
+  libri senza posizione;
+\item
+  persone senza documenti validi.
+\end{itemize}
+
+Alternativa anti-join:
+
+\begin{verbatim}
+SELECT r.*
+FROM R AS r
+LEFT JOIN S AS s
+  ON s.rid = r.id AND <condizione vietata>
+WHERE s.rid IS NULL;
+\end{verbatim}
+
+Evitare \texttt{NOT\ IN} se la sottoquery può contenere \texttt{NULL}:
+un solo nullo può rendere il confronto \texttt{UNKNOWN} per tutte le
+righe.
+
+\section{10. Conteggio includendo lo
+zero}\label{10-conteggio-includendo-lo-zero}
+
+Il filtro sulla tabella destra deve stare
+nell\textquotesingle{}\texttt{ON}:
+
+\begin{verbatim}
+SELECT r.id, COUNT(s.id) AS n
+FROM R AS r
+LEFT JOIN S AS s
+  ON s.rid = r.id
+ AND <condizione su S>
+GROUP BY r.id;
+\end{verbatim}
+
+Usare \texttt{COUNT(s.id)}, non \texttt{COUNT(*)}: la riga esterna
+prodotta dal \texttt{LEFT\ JOIN} farebbe risultare 1 anche quando
+\texttt{S} manca.
+
+Per una somma:
+
+\begin{verbatim}
+COALESCE(SUM(d.quantity * p.price), 0) AS totale
+\end{verbatim}
+
+\texttt{COALESCE} trasforma la somma nulla degli oggetti senza dettagli
+in zero.
+
+\section{11. Massimo con tutti gli ex
+aequo}\label{11-massimo-con-tutti-gli-ex-aequo}
+
+\begin{verbatim}
+WITH conteggi AS (
+    SELECT r.id, COUNT(s.id) AS n
+    FROM R AS r
+    LEFT JOIN S AS s ON s.rid = r.id
+    GROUP BY r.id
+)
+SELECT *
+FROM conteggi
+WHERE n = (SELECT MAX(n) FROM conteggi);
+\end{verbatim}
+
+Non usare \texttt{ORDER\ BY\ ...\ LIMIT\ 1} se la traccia dice ``la
+persona (o persone)'' o se gli ex aequo devono essere restituiti.
+
+\section{12. Più della media}\label{12-piuxf9-della-media}
+
+Prima costruire una riga di conteggio per ogni oggetto, poi calcolare la
+media:
+
+\begin{verbatim}
+WITH conteggi AS (
+    SELECT r.id, COUNT(s.id) AS n
+    FROM R AS r
+    LEFT JOIN S AS s
+      ON s.rid = r.id
+     AND <intervallo temporale>
+    GROUP BY r.id
+)
+SELECT *
+FROM conteggi
+WHERE n > (SELECT AVG(n) FROM conteggi);
+\end{verbatim}
+
+Specificare se la media è su tutti gli oggetti o solo su quelli
+``attivi''. La prima interpretazione richiede il \texttt{LEFT\ JOIN}; la
+seconda può raggruppare solo \texttt{S}.
+
+\section{13. Coppie e ``due righe diverse'': self
+join}\label{13-coppie-e-due-righe-diverse-self-join}
+
+\begin{verbatim}
+SELECT DISTINCT x1.id, x2.id
+FROM X AS x1
+JOIN X AS x2
+  ON <proprietà comune>
+ AND x1.id < x2.id;
+\end{verbatim}
+
+\texttt{x1.id\ \textless{}\ x2.id} elimina sia la coppia \texttt{(x,x)}
+sia il duplicato simmetrico \texttt{(y,x)}. Se le due righe hanno ruoli
+temporali diversi, è più naturale usare
+\texttt{x2.year\ =\ x1.year\ +\ 1}.
+
+Pattern d\textquotesingle esame:
+
+\begin{itemize}
+\tightlist
+\item
+  passeggeri sullo stesso volo;
+\item
+  stesso prodotto e stessa quantità in due ordini distinti;
+\item
+  stesso premio in anni consecutivi e film differenti;
+\item
+  data di inizio di un prestito uguale alla fine di un altro.
+\end{itemize}
+
+\section{\texorpdfstring{14. ``Tutti'': divisione con doppio
+\texttt{NOT\ EXISTS}}{14. ``Tutti'': divisione con doppio NOT EXISTS}}\label{14-tutti-divisione-con-doppio-not-exists}
+
+``Trova gli \texttt{A} associati a \textbf{ogni} \texttt{B}
+disponibile'' significa:
+
+\begin{quote}
+non esiste un B per il quale non esiste l\textquotesingle associazione
+A-B.
+\end{quote}
+
+\begin{verbatim}
+SELECT a.*
+FROM A AS a
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM B AS b
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM AB AS x
+        WHERE x.aid = a.id
+          AND x.bid = b.id
+    )
+);
+\end{verbatim}
+
+È il pattern per persone che hanno richiesto tutti i certificati e
+artisti che hanno vinto in ogni categoria.
+
+Alternativa con conteggi, valida se si gestiscono bene duplicati e
+insieme vuoto:
+
+\begin{verbatim}
+HAVING COUNT(DISTINCT x.bid) = (SELECT COUNT(*) FROM B)
+\end{verbatim}
+
+\section{15. Conteggi distinti}\label{15-conteggi-distinti}
+
+La parola ``diversi/e'' di solito richiede \texttt{DISTINCT} dentro
+l\textquotesingle aggregato:
+
+\begin{verbatim}
+COUNT(DISTINCT certificate)
+COUNT(DISTINCT venue)
+\end{verbatim}
+
+Non confondere \texttt{SELECT\ DISTINCT} (elimina righe duplicate del
+risultato) con \texttt{COUNT(DISTINCT\ x)} (conta valori distinti di
+\texttt{x}).
+
+\section{16. Date}\label{16-date}
+
+Per un anno usare un intervallo semiaperto, che funziona bene anche con
+timestamp:
+
+\begin{verbatim}
+date_col >= DATE '2025-01-01'
+AND date_col < DATE '2026-01-01'
+\end{verbatim}
+
+Per ``non scaduto'' la traccia del 14/01/2025 definisce esplicitamente
+la validità come \texttt{expiry\_date\ \textgreater{}=\ CURRENT\_DATE};
+non aggiungere altri requisiti se non richiesti.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte III - Algebra relazionale
+
+\section{17. Operatori essenziali}\label{17-operatori-essenziali}
+
+\begin{itemize}
+\tightlist
+\item
+  selezione: \texttt{σ\_condizione(R)} - filtra tuple;
+\item
+  proiezione: \texttt{π\_attributi(R)} - sceglie attributi ed elimina
+  duplicati;
+\item
+  ridenominazione: \texttt{ρ\_nuovoNome(R)} o
+  \texttt{ρ\_\{nuovo←vecchio\}(R)};
+\item
+  prodotto: \texttt{R\ ×\ S};
+\item
+  theta/equi-join: \texttt{R\ ⋈\_condizione\ S};
+\item
+  unione \texttt{∪}, intersezione \texttt{∩}, differenza \texttt{−};
+\item
+  divisione \texttt{R(A,B)\ ÷\ S(B)} restituisce gli \texttt{A}
+  associati a tutti i \texttt{B} di \texttt{S}.
+\end{itemize}
+
+Unione, intersezione e differenza richiedono compatibilità: stesso grado
+e domini corrispondenti. Ridenominare gli attributi quando necessario.
+
+\section{18. Pattern algebrici
+d\textquotesingle esame}\label{18-pattern-algebrici-desame}
+
+\subsection{Oggetti senza una proprietà
+vietata}\label{oggetti-senza-una-proprietuxe0-vietata}
+
+\begin{verbatim}
+π_id(R) − π_rid(σ_condizione(S))
+\end{verbatim}
+
+Se la condizione richiede altre tabelle, prima costruire un join
+ristretto.
+
+\subsection{Almeno A e almeno B}\label{almeno-a-e-almeno-b}
+
+\begin{verbatim}
+π_id(σ_tipo='A'(X)) ∩ π_id(σ_tipo='B'(X))
+\end{verbatim}
+
+Non usare
+\texttt{σ\_(tipo=\textquotesingle{}A\textquotesingle{}\ ∧\ tipo=\textquotesingle{}B\textquotesingle{})(X)}:
+una singola tupla non può avere due valori diversi nello stesso
+attributo.
+
+\subsection{Tutti}\label{tutti}
+
+\begin{verbatim}
+π_{a,b}(AB) ÷ π_b(B)
+\end{verbatim}
+
+Gli attributi divisori devono avere lo stesso nome/dominio; usare
+\texttt{ρ} se necessario.
+
+\subsection{Massimo senza aggregati}\label{massimo-senza-aggregati}
+
+Per trovare i valori non dominati:
+
+\begin{verbatim}
+T      = σ_condizione(R)
+Piccoli = π_{t1.attributi}(
+           σ_{t1.valore < t2.valore}(ρ_t1(T) × ρ_t2(T))
+         )
+Massimi = T − Piccoli
+\end{verbatim}
+
+Conserva tutti gli ex aequo.
+
+\subsection{Ottimizzazione}\label{ottimizzazione}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  spingere le selezioni vicino alle relazioni di origine;
+\item
+  spingere le proiezioni, conservando gli attributi necessari ai join;
+\item
+  sostituire prodotti seguiti da selezione con join;
+\item
+  per un anti-join, sottrarre prima i soli identificatori.
+\end{enumerate}
+
+Esempio ``film senza premiere'':
+
+\begin{verbatim}
+Premiere = π_fid(σ_{is_premiere=true}(screening))
+Senza    = π_fid(film) − Premiere
+Risultato = π_{fid,title}(film ⋈ Senza)
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte IV - Progettazione ER e traduzione
+
+\section{19. Cardinalità da una FK}\label{19-cardinalituxe0-da-una-fk}
+
+Data \texttt{S.fk\ REFERENCES\ R(pk)}:
+
+\begin{itemize}
+\tightlist
+\item
+  ogni tupla di \texttt{S} è associata a \textbf{0..1 R} se la FK è
+  nullable;
+\item
+  ogni tupla di \texttt{S} è associata a \textbf{1..1 R} se la FK è
+  \texttt{NOT\ NULL};
+\item
+  una tupla di \texttt{R} può normalmente essere associata a
+  \textbf{0..N S};
+\item
+  \texttt{UNIQUE(S.fk)} abbassa il massimo sul lato \texttt{R} a 1.
+\end{itemize}
+
+Una FK composta va trattata come un\textquotesingle unità concettuale.
+Una FK ricorsiva crea un\textquotesingle associazione ricorsiva con
+ruoli espliciti, per esempio \texttt{figlio} e \texttt{padre}.
+
+\section{20. Da ER a relazionale}\label{20-da-er-a-relazionale}
+
+\subsection{Entità}\label{entituxe0}
+
+Ogni entità diventa una relazione; l\textquotesingle identificatore
+diventa PK. Attributi opzionali diventano colonne nullable.
+
+\subsection{Associazione 1:N}\label{associazione-1n}
+
+Migrare la PK del lato 1 come FK nel lato N. La FK è nullable se la
+partecipazione del lato N ha minimo 0.
+
+\subsection{Associazione 1:1}\label{associazione-11}
+
+Migrare la chiave in uno dei lati, preferibilmente in quello con
+partecipazione totale, aggiungendo \texttt{UNIQUE} alla FK. Se
+l\textquotesingle associazione ha attributi o si vuole mantenerla
+autonoma, si può creare una relazione separata.
+
+\subsection{Associazione N:M o n-aria}\label{associazione-nm-o-n-aria}
+
+Creare una relazione con le FK verso tutte le entità partecipanti. Di
+norma la PK è la combinazione delle FK. Gli attributi
+dell\textquotesingle associazione restano qui.
+
+Se la stessa coppia può ricomparire in date diverse,
+l\textquotesingle associazione è storica: includere, per esempio,
+\texttt{data\_inizio} nella PK.
+
+\subsection{Attributo multivalore}\label{attributo-multivalore}
+
+Creare una relazione separata, per esempio:
+
+\begin{verbatim}
+libro(bid, titolo)
+genere(bid, genere)       PK(bid, genere), FK bid → libro.bid
+\end{verbatim}
+
+\subsection{Entità debole}\label{entituxe0-debole}
+
+La PK contiene l\textquotesingle identificatore parziale più la PK
+dell\textquotesingle entità proprietaria; quest\textquotesingle ultima è
+anche FK.
+
+\section{21. Generalizzazioni}\label{21-generalizzazioni}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Totale (T)}: ogni istanza del padre appartiene ad almeno un
+  figlio.
+\item
+  \textbf{Parziale (P)}: possono esistere istanze del padre in nessun
+  figlio.
+\item
+  \textbf{Esclusiva (E)}: un\textquotesingle istanza appartiene al
+  massimo a un figlio.
+\item
+  \textbf{Sovrapposta (S)}: può appartenere a più figli.
+\end{itemize}
+
+Per padre \texttt{E(k,a)} e figli \texttt{E1(b)}, \texttt{E2(c)}:
+
+\subsection{Strategia A - sola relazione
+padre}\label{strategia-a---sola-relazione-padre}
+
+\begin{verbatim}
+E(k, a, b*, c*, tipo)
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{tipo} è nullable se la gerarchia è parziale;
+\item
+  con gerarchia sovrapposta servono più indicatori o un valore per ogni
+  combinazione;
+\item
+  servono vincoli extra-schema per coerenza tra tipo e attributi dei
+  figli.
+\end{itemize}
+
+\subsection{Strategia B - sole relazioni
+figlie}\label{strategia-b---sole-relazioni-figlie}
+
+\begin{verbatim}
+E1(k, a, b)
+E2(k, a, c)
+\end{verbatim}
+
+È \textbf{impossibile per una gerarchia parziale}, perché perderebbe le
+istanze del padre che non appartengono a figli. Con sovrapposizione
+duplica i dati comuni.
+
+\subsection{Strategia C - padre e
+figli}\label{strategia-c---padre-e-figli}
+
+\begin{verbatim}
+E(k, a)
+E1(k, b)     PK/FK k → E.k
+E2(k, c)     PK/FK k → E.k
+\end{verbatim}
+
+È generale e riduce i nulli, ma richiede join. Totalità ed esclusività
+spesso richiedono vincoli extra-schema.
+
+\section{22. Da relazionale a ER:
+minimizzazione}\label{22-da-relazionale-a-er-minimizzazione}
+
+\begin{itemize}
+\tightlist
+\item
+  Una tabella con propria PK e attributi descrittivi diventa normalmente
+  entità.
+\item
+  Una tabella la cui PK è esattamente l\textquotesingle unione di due o
+  più FK e che non ha attributi propri può essere minimizzata in
+  un\textquotesingle associazione N:M.
+\item
+  Una tabella con PK propria e FK non identificanti resta entità
+  collegata da associazioni.
+\item
+  Due FK dalla stessa tabella alla stessa entità sono due
+  associazioni/ruoli distinti, non una sola.
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte V - Normalizzazione
+
+\section{23. Dipendenze funzionali e
+chiusura}\label{23-dipendenze-funzionali-e-chiusura}
+
+\texttt{X\ →\ Y} significa: tuple uguali su \texttt{X} devono essere
+uguali anche su \texttt{Y}. Per cercare una chiave si calcola la
+chiusura \texttt{X+}, aggiungendo ripetutamente gli attributi
+determinati dalle DF. \texttt{X} è superchiave se \texttt{X+} contiene
+tutti gli attributi; è chiave se è anche minimale.
+
+Regole utili:
+
+\begin{itemize}
+\tightlist
+\item
+  riflessività: se \texttt{Y\ ⊆\ X}, allora \texttt{X\ →\ Y};
+\item
+  arricchimento: \texttt{X\ →\ Y} implica \texttt{XZ\ →\ YZ};
+\item
+  transitività: \texttt{X\ →\ Y} e \texttt{Y\ →\ Z} implicano
+  \texttt{X\ →\ Z};
+\item
+  decomposizione: \texttt{X\ →\ YZ} implica \texttt{X\ →\ Y} e
+  \texttt{X\ →\ Z};
+\item
+  unione: \texttt{X\ →\ Y} e \texttt{X\ →\ Z} implicano
+  \texttt{X\ →\ YZ}.
+\end{itemize}
+
+\section{24. Forme normali}\label{24-forme-normali}
+
+\subsection{1NF}\label{1nf}
+
+Tutti gli attributi sono atomici; niente liste o attributi multivalore
+nella stessa cella.
+
+\subsection{2NF}\label{2nf}
+
+Ogni attributo non primo dipende \textbf{completamente} da ogni chiave
+candidata: niente dipendenze da una parte propria di una chiave
+composta. Una relazione con tutte le chiavi semplici è automaticamente
+in 2NF.
+
+\subsection{3NF}\label{3nf}
+
+Per ogni DF non banale \texttt{X\ →\ A}, almeno una condizione vale:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{X} è una superchiave; oppure
+\item
+  \texttt{A} è primo.
+\end{itemize}
+
+\subsection{BCNF}\label{bcnf}
+
+Per ogni DF non banale \texttt{X\ →\ A}, \texttt{X} deve essere una
+superchiave. È più forte della 3NF.
+
+Diagnosi tipica: con PK semplice \texttt{bid} e DF
+\texttt{scaffale\ →\ ripiano}, la relazione è in 2NF ma non in 3NF/BCNF:
+\texttt{scaffale} non è superchiave e \texttt{ripiano} non è primo.
+
+\section{25. Decomposizione senza perdita e
+conservazione}\label{25-decomposizione-senza-perdita-e-conservazione}
+
+Una decomposizione è \textbf{senza perdita} se il join delle proiezioni
+ricostruisce esattamente la relazione originaria, senza tuple spurie.
+Per una decomposizione binaria \texttt{R\ →\ R1,R2}, è senza perdita se
+l\textquotesingle intersezione \texttt{R1\ ∩\ R2} determina
+funzionalmente tutti gli attributi di \texttt{R1} oppure tutti quelli di
+\texttt{R2}.
+
+È \textbf{conservativa rispetto alle dipendenze} se tutte le DF
+originarie possono essere verificate sulle singole relazioni decomposte,
+senza eseguire join.
+
+La sintesi in 3NF può sempre ottenere perdita nulla e conservazione
+delle DF. Una decomposizione BCNF può sacrificare la conservazione.
+
+Procedura pratica d\textquotesingle esame:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  calcolare le chiavi;
+\item
+  trovare DF che violano la forma richiesta;
+\item
+  creare una relazione per ciascun determinante e i suoi dipendenti;
+\item
+  eliminare relazioni contenute in altre;
+\item
+  assicurarsi che almeno una relazione contenga una chiave originaria;
+\item
+  dichiarare PK e forma normale di ogni relazione.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte VI - Sicurezza
+
+\section{26. Politiche di accesso}\label{26-politiche-di-accesso}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Need-to-know / minimo privilegio}: accesso solo ai dati
+  strettamente necessari. Ottima protezione, rischio di negare accessi
+  innocui. Tipica di un sistema chiuso: tutto è vietato salvo
+  autorizzazione esplicita.
+\item
+  \textbf{Maximized sharing / massima condivisione}: massimizza gli
+  accessi, proteggendo solo ciò che è riservato. Più flessibile, meno
+  prudente. Tipica di un sistema aperto: tutto è permesso salvo divieto
+  esplicito.
+\item
+  \textbf{DAC, discrezionale}: proprietari/utenti possono concedere e
+  revocare privilegi. Flessibile, ma non controlla il flusso dopo la
+  lettura.
+\item
+  \textbf{MAC, mandatoria}: soggetti e oggetti hanno classi di
+  sicurezza; le regole centrali controllano anche il flusso. Più rigida
+  e adatta ad alta sicurezza.
+\end{itemize}
+
+System R è discrezionale, chiuso, con amministrazione decentralizzata
+tramite ownership; supporta controllo per nome e per contenuto.
+
+\section{\texorpdfstring{27. \texttt{GRANT}, grant option e
+\texttt{REVOKE}}{27. GRANT, grant option e REVOKE}}\label{27-grant-grant-option-e-revoke}
+
+\begin{verbatim}
+GRANT SELECT, INSERT ON R TO utente WITH GRANT OPTION;
+REVOKE SELECT ON R FROM utente CASCADE;
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{WITH\ GRANT\ OPTION} permette al destinatario di delegare quel
+  privilegio.
+\item
+  Si può delegare solo ciò che si possiede con grant option.
+\item
+  Ogni arco del grafo va etichettato con privilegio, tempo e presenza di
+  GO.
+\item
+  Conviene disegnare un grafo separato per ogni privilegio.
+\end{itemize}
+
+Revoca ricorsiva: rimuovere l\textquotesingle arco revocato e tutti gli
+archi che non avrebbero potuto essere creati senza di esso.
+Un\textquotesingle altra sorgente salva il privilegio solo se è
+indipendente e, per sostenere una delega già avvenuta, era disponibile
+con grant option al tempo di quella delega. I timestamp contano.
+
+\section{28. Cavallo di Troia}\label{28-cavallo-di-troia}
+
+Un utente autorizzato esegue una procedura apparentemente lecita che
+contiene codice nascosto. Sfruttando i privilegi
+dell\textquotesingle esecutore, il codice legge un oggetto segreto e ne
+copia il contenuto in un oggetto accessibile
+all\textquotesingle attaccante. Le politiche discrezionali controllano
+l\textquotesingle accesso iniziale ma non il successivo flusso
+dell\textquotesingle informazione; una politica mandatoria di controllo
+del flusso mira a impedirlo.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte VII - Transazioni e indici
+
+\section{29. Transazioni e ACID}\label{29-transazioni-e-acid}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{COMMIT}: termina con successo e rende permanenti gli effetti.
+\item
+  \texttt{ROLLBACK}: annulla gli effetti non confermati.
+\item
+  In \texttt{AUTOCOMMIT} ogni istruzione SQL è una transazione.
+\end{itemize}
+
+ACID:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Atomicity}: tutto o niente.
+\item
+  \textbf{Consistency}: da uno stato che soddisfa i vincoli a un altro
+  stato che li soddisfa.
+\item
+  \textbf{Isolation}: esecuzione concorrente equivalente a un ordine
+  seriale.
+\item
+  \textbf{Durability}: dopo il commit gli effetti persistono anche dopo
+  guasti.
+\end{itemize}
+
+Anomalie:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{lost update}: un aggiornamento sovrascrive quello concorrente;
+\item
+  \textbf{dirty read}: T2 legge un dato scritto da T1 prima del commit;
+  T1 poi fa rollback e T2 ha usato un valore mai esistito stabilmente;
+\item
+  \textbf{incorrect summary}: un aggregato legge una parte dei dati
+  prima e una parte dopo un aggiornamento concorrente.
+\end{itemize}
+
+Il dirty read si previene non rendendo visibili modifiche non
+confermate, con livello almeno \texttt{READ\ COMMITTED} e/o lock
+appropriati.
+
+\section{30. Strutture fisiche e
+indici}\label{30-strutture-fisiche-e-indici}
+
+\begin{itemize}
+\tightlist
+\item
+  Strutture primarie: sequenziale, hash (accesso calcolato), albero.
+\item
+  Hash: molto efficiente per uguaglianza, non per intervalli; gestisce
+  collisioni. Nel lessico delle dispense è una struttura primaria.
+\item
+  Un indice primario determina la disposizione dei record ed è
+  \textbf{sparso}: una voce per blocco dati.
+\item
+  Un indice secondario non determina la disposizione ed è sempre
+  \textbf{denso}: deve rappresentare ogni valore/record indicizzato.
+\end{itemize}
+
+Formule:
+
+\begin{verbatim}
+bfr = floor(B / R)
+blocchi_dati = ceil(numero_record / bfr)
+voci_indice_primario = blocchi_dati
+\end{verbatim}
+
+Esempio d\textquotesingle esame: 20.000 record, \texttt{bfr\ =\ 10} →
+2.000 blocchi → 2.000 voci nell\textquotesingle indice primario.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Parte VIII - Ripasso minimo degli argomenti non comparsi
+
+\section{31. DBMS, livelli e
+indipendenza}\label{31-dbms-livelli-e-indipendenza}
+
+Un DBMS gestisce dati persistenti, condivisi e consistenti, offrendo
+controllo di concorrenza, sicurezza, recupero e linguaggi di
+interrogazione. I livelli esterno, concettuale e interno separano viste
+utente, schema logico e memorizzazione fisica.
+L\textquotesingle indipendenza logica limita l\textquotesingle impatto
+dei cambiamenti concettuali sulle viste; quella fisica limita
+l\textquotesingle impatto dei cambiamenti di memorizzazione sullo schema
+logico.
+
+\section{32. Trigger e viste}\label{32-trigger-e-viste}
+
+Un trigger segue il paradigma evento-condizione-azione e reagisce a
+\texttt{INSERT}, \texttt{UPDATE} o \texttt{DELETE},
+\texttt{BEFORE}/\texttt{AFTER}, per riga o per istruzione. È utile per
+vincoli non esprimibili nel DDL e dati derivati, ma va evitato quando un
+vincolo dichiarativo basta.
+
+Una vista è una query con nome. Una vista semplice su una sola tabella
+può essere aggiornabile; join, aggregazioni e raggruppamenti in genere
+impediscono l\textquotesingle aggiornamento diretto.
+\texttt{WITH\ CHECK\ OPTION} impedisce modifiche che rendano la riga
+invisibile nella vista.
+
+\section{33. NoSQL in una frase}\label{33-nosql-in-una-frase}
+
+I sistemi NoSQL rinunciano a parte dell\textquotesingle uniformità del
+modello relazionale per flessibilità, distribuzione o specifici pattern
+di accesso. Nei document store come MongoDB i dati sono documenti
+JSON/BSON annidati; la scelta tra embedding e riferimenti dipende da
+cardinalità, aggiornamenti e letture congiunte.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Checklist finale da memorizzare
+
+\begin{itemize}
+\tightlist
+\item
+  PK = \texttt{UNIQUE\ +\ NOT\ NULL}; ogni colonna della PK composta è
+  non nulla.
+\item
+  FK senza \texttt{NOT\ NULL} può essere nulla; FK senza
+  \texttt{CASCADE} blocca la modifica.
+\item
+  \texttt{LEFT\ JOIN} + \texttt{WHERE\ destra.id\ IS\ NULL} = ``senza''.
+\item
+  Filtro sul lato destro nell\textquotesingle{}\texttt{ON} per non
+  perdere gli zeri.
+\item
+  \texttt{COUNT(colonna\_destra)}, non \texttt{COUNT(*)}, dopo un
+  \texttt{LEFT\ JOIN}.
+\item
+  ``diversi'' → spesso \texttt{COUNT(DISTINCT\ ...)}.
+\item
+  ``tutti'' → divisione o doppio \texttt{NOT\ EXISTS}.
+\item
+  ``massimo'' → confrontare con \texttt{MAX}, conservando gli ex aequo.
+\item
+  coppie → self join; \texttt{\textless{}} elimina simmetrie,
+  \texttt{+\ 1} esprime anni consecutivi.
+\item
+  algebra: ``almeno A e almeno B'' → intersezione, non
+  \texttt{A\ AND\ B} sulla stessa tupla.
+\item
+  2NF elimina dipendenze parziali; 3NF ammette RHS primo; BCNF pretende
+  determinante superchiave.
+\item
+  revoca: separare i privilegi e rispettare provenienza, grant option e
+  tempo.
+\item
+  indice primario sparso, secondario denso; \texttt{bfr\ =\ floor(B/R)}.
+\item
+  \texttt{COMMIT} successo; coerenza = rispetto dei vincoli; dirty read
+  = lettura di scritture non confermate.
+\end{itemize}
+
+\end{document}

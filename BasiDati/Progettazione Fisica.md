@@ -137,18 +137,14 @@ La caratteristica più importante nella gestione di un albero di ricerca è **ma
 
 - Un file organizzato con accesso sequenziale non ordinato può essere affiancato da un indice secondario per favorire le ricerche puntuali sulla pseudochiave (soluzione sempre prevista in ogni DBMS)
 
-- Un file organizzato con accesso hash o sequenziale ordinato NON può avere un indice primario
+- Un file organizzato con accesso hash o sequenziale non ordinato NON può avere un indice primario
 
-- Un file può avere numerosi indici secondariConsiderazioni
-
-- Gli indici sono file di piccole dimensioni
+- Un file può avere numerosi indici secondari
 
 - Le ricerche sui file di indice sono efficienti (occupano poche pagine e possono essere interamente caricati nel buffer)
 
 - Essendo ordinati, gli indici rendono efficienti sia le ricerche puntuali sia le ricerche per intervallo
 
-- Gli indici hanno tempi di accesso logaritmico in funzione del numero di blocchi occupatiConsiderazioni
+- Gli indici hanno tempi di accesso logaritmico in funzione del numero di blocchi occupati
 
 - Quasi tutti i DBMS creano un indice per gli attributi della chiave primaria e delle chiavi (attributi con vincolo UNIQUE). Questo agevola la verifica del vincolo di univocità
-
-- Alcuni sistemi adottano la dicitura _indice primario_ per denotare un indice definito sugli attributi della chiave primaria di una relazione. Questa terminologia differisce da quella dottata in queste slide dove un indice primario indica il campo usato per ordinare il contenuto del file

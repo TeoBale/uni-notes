@@ -1,0 +1,907 @@
+Appunti lezione del 20260309
+============================
+
+Algebra relazionale: linguaggio procedurale per interrogazione di schemi di basi di dati
+
+Operatori booleani:
+and logico: ∧
+or logico (inclusivo): ∨
+not logico: ¬
+
+Esempi di interrogazione (query) sulla base di dati imdb 
+- restituire il titolo delle pellicole prodotte nel 2010 (oppure quelle prodotte a partire dal 2010)
+- restituire le pellicole che sono di genere thriller e Drama
+- restituire il codice, il titolo e l'anno delle pellicole di genere thriller e Drama
+- trovare il nome degli attori che hanno partecipato a Shutter Island
+- restitire i film prodotti in Francia e solo in Francia
+
+
+Operatori dell'algebra relazionale
+Operatori insiemistici
+- unione (∪)
+- sottrazione (-)
+- intersezione (∩)
+
+Date due relazioni R, S definiamo:
+
+R∪S = { t | t∈R ∨ t∈S } - unione / UNION
+
+R-S = { t | t∈R ∧ t∉S } - sottrazione / EXCEPT
+
+S-R = { t | t∈S ∧ t∉R }
+
+S∩R = { t | t∈R ∧ t∈S } - intersezione (operatore derivato) / INTERESECT 
+
+S∩R = R∪S - (R-S) - (S-R)
+
+
+R
+=====
+A  |  B  |  C
+=============
+a1   b1    c1
+a1   b2    c1
+a2   b1    c2
+
+S
+=====
+A  |  B  |  C
+=============
+a1   b1    c1
+a2   b2    c2
+
+R∪S
+=====
+A  |  B  |  C
+=============
+a1   b1    c1
+a1   b2    c1
+a2   b1    c2
+a2   b2    c2
+
+Requisiti per applicare l'unione a due relazioni  R, S (condizioni di compatibilità all'unione)
+- R, S devono avere lo stesso grado
+- gli attributi di R, S devono avere posizionalmente lo stesso dominio 
+- il nome degli attributi può essere diverso, non costituisce un problema per l'unione
+
+
+R-S
+=====
+A  |  B  |  C
+=============
+a1   b2    c1
+a2   b1    c2
+
+
+S-R
+=====
+A  |  B  |  C
+=============
+a2   b2    c2
+
+
+R∩S
+=====
+A  |  B  |  C
+=============
+a1   b1    c1
+
+
+operatori unari
+- selezione - 𝛔
+- proiezione - π
+- ridenominazione - ρ
+
+
+selezione:
+𝛔_<predicato>(R)
+
+𝛔_(A=a1)(R)
+
+R
+=====
+A  |  B  |  C
+=============
+a1   b1    c1
+a1   b2    c1
+
+Esempio su imdb: film del 2010
+𝛔_(year='2010') (movie_a) -> risultato: una relazione con schema identico a movie_a contentente solo i record che soddisfano year='2010'
+
+esempio: film successivi al 2010 con durata superiore a 120
+𝛔_(year>'2010'∧length > 120) (movie_a) 
+
+esempio: film successivi al 2010 con durata inferiore o uguale a 120
+𝛔_(year>'2010'∧ ¬(length > 120)) (movie_a) 
+
+in questo caso, i record con length = [NULL] sono inclusi nel risultato? no. I null non sono mai considerati nelle operazioni di confronto.
+
+Per catturare i valori nulli ho un operatore specifico: is null e is not null:
+voglio i film la cui durata non è nota
+𝛔_(length is null) (movie_a) 
+
+voglio i film la cui durata è nota
+𝛔_(length is not null) (movie_a) 
+
+
+operazione di proiezione 
+π_<a_list>(R)
+
+π_(A,B)(R)
+
+R
+=====
+A  |  B  
+========
+a1   b1  
+a1   b2 
+a2   b1 
+
+esempio su imdb:
+π_(id, official_title) (movie_a)
+
+trovare il titolo dei film del 2010
+π_(id,official_title)(𝛔_(year='2010') (movie_a)) 
+
+usando espressioni intermedie per semplificare la scrittura:
+A = 𝛔_(year='2010') (movie_a)
+B = π_(id,official_title) A
+
+
+ridenominazione - ρ
+ρ_(a'<-a)(R)
+
+ρ_(D<-C)(R)
+
+R
+=====
+A  |  B  |  D
+=============
+a1   b1    c1
+a1   b2    c1
+a2   b1    c2
+
+ρ_(movie<-id)(movie_a)
+
+Esempi con gli operatori unari e insiemistici
+- trovare i film di genere thriller
+genre(movie, genre)
+π_(movie)(𝛔_(genre='Thriller')(genre))
+
+- trovare i film di genere thriller o comedy
+π_(movie)(𝛔_(genre='Thriller')(genre))
+∪
+π_(movie)(𝛔_(genre='Comedy')(genre))
+
+genre
+=====
+movie | genre
+=============
+001     Thriller *
+002     Thriller *
+001     Comedy *
+003     Comedy *
+003     Drama
+
+(𝛔_(genre='Thriller')(genre))
+movie | genre
+=============
+001     Thriller
+002     Thriller
+
+(𝛔_(genre='Comedy')(genre))
+movie | genre
+=============
+001     Comedy
+003     Comedy
+
+(𝛔_(genre='Thriller')(genre)) ∪ (𝛔_(genre='Comedy')(genre))
+movie | genre
+=============
+001     Thriller
+002     Thriller
+001     Comedy
+003     Comedy
+
+(π_(movie)(𝛔_(genre='Thriller')(genre))) ∪ (π_(movie)(𝛔_(genre='Comedy')(genre)))
+movie 
+=============
+001   
+002         
+003     
+
+soluzione alternativa per trovare i film di genre Thrille o Comedy
+π_(movie)(𝛔_(genre='Thriller' ∨ genre='Comedy')(genre))
+
+- trovare i film con valutazioni superiori a 8 su scala 10
+rating(movie, check_date, source, votes, scale, grade)
+π_(movie)(𝛔_(scale=10 ∧ grade>8)(rating))
+
+rating
+======
+movie | check_date | source | votes | scale | grade
+====================================================
+001     2026-03-09   imdb     2324      10      9.1 * 
+001     2026-03-08   imdb     352352    5       2.1   
+001     2026-03-07   corriere 234323    10      9.3 * 
+002     2026-03-08   repub.     0       100     70.1
+003     2026-03-09   imdb               10      8.5 *
+003     2026-03-09   corriere           10      9.45 *
+
+- trovare i film che hanno tutte le valutazioni superiori a 8 su scala 10
+π_(movie)(𝛔_(scale=10 ∧ grade>8)(rating))
+-
+π_(movie)(𝛔_(¬(scale=10 ∧ grade>8))(rating))
+
+oppure:
+π_(movie)(𝛔_(scale=10 ∧ grade>8)(rating))
+-
+π_(movie)(𝛔_(scale<>10 ∨ grade<=8)(rating))
+
+rating
+======
+movie | check_date | source | votes | scale | grade
+====================================================
+001     2026-03-09   imdb     2324      10      9.1  
+001     2026-03-08   imdb     352352    5       2.1   
+001     2026-03-07   corriere 234323    10      9.3  
+002     2026-03-08   repub.     0       100     70.1
+003     2026-03-09   imdb               10      8.5   *
+003     2026-03-09   corriere           10      9.45  *
+
+(𝛔_(scale=10 ∧ grade>8)(rating))
+======
+movie | check_date | source | votes | scale | grade
+====================================================
+001     2026-03-09   imdb     2324      10      9.1    
+001     2026-03-07   corriere 234323    10      9.3  
+003     2026-03-09   imdb               10      8.5   
+003     2026-03-09   corriere           10      9.45  
+
+(𝛔_(¬(scale=10 ∧ grade>8))(rating))
+======
+movie | check_date | source | votes | scale | grade
+==================================================== 
+==================================================== 
+001     2026-03-08   imdb     352352    5       2.1   
+002     2026-03-08   repub.     0       100     70.1  
+
+π_(movie)(𝛔_(scale=10 ∧ grade>8)(rating)) -
+π_(movie)(𝛔_(¬(scale=10 ∧ grade>8))(rating))
+movie
+=====
+003
+
+
+- trovare il nome delle persone nate negli anni 80
+person(id, given_name, birth_date, death_date, bio)
+π_(id, given_name)(𝛔_(birth_date>='1980-01-01' ∧ birth_date<='1989-12-31')(rating))
+
+soluzione alternativa:
+π_(id, given_name)(𝛔_(birth_date between '1980-01-01' ∧ '1989-12-31')(rating))
+
+- trovare i film che sono thriller e comedy ( film che sono sia thriller sia comedy)
+
+genre
+=====
+movie | genre
+=============
+001     Thriller *
+002     Thriller
+001     Comedy *
+003     Comedy
+003     Drama
+
+π_(movie)(𝛔_(genre='Thriller')(genre))
+∩
+π_(movie)(𝛔_(genre='Comedy')(genre))
+
+(𝛔_(genre='Thriller')(genre))
+movie | genre
+=============
+001     Thriller 
+002     Thriller
+
+(𝛔_(genre='Comedy')(genre))
+movie | genre
+=============
+001     Comedy 
+003     Comedy
+
+π_(movie)(𝛔_(genre='Thriller')(genre))
+movie 
+=============
+001    
+002   
+
+π_(movie)(𝛔_(genre='Comedy')(genre))
+movie 
+=============
+001      
+003     
+
+la seguente soluzione è errata: è sufficiente soddisfare una delle due condizioni per essere nel risultato:
+π_(movie)(𝛔_(genre='Thriller' ∨ genre='Comedy')(genre))
+genre
+=====
+movie | genre
+=============
+001     Thriller *
+002     Thriller *
+001     Comedy *
+003     Comedy *
+003     Drama
+
+la seguente soluzione è errata: produce sempre l'insieme vuoto come risultato (un film non può avere entrambi i valori di genere che cerchiamo su un unico record)
+π_(movie)(𝛔_(genre='Thriller' ∧ genre='Comedy')(genre))
+genre
+=====
+movie | genre
+=============
+001     Thriller 
+002     Thriller 
+001     Comedy 
+003     Comedy 
+003     Drama
+
+
+- trovare i film prodotti in francia e usa
+produced(movie, country)
+π_(movie)(𝛔_(country='FRA')(produced))
+∩
+π_(movie)(𝛔_(country='USA')(produced))
+
+- trovare i film prodotti solo in francia
+
+produced
+========
+movie | country
+===============
+001     FRA
+001     USA
+002     USA
+003     FRA *
+
+π_(movie)(𝛔_(country='FRA')(produced))
+-
+π_(movie)(𝛔_(country<>'FRA')(produced))
+
+π_(movie)(𝛔_(country='FRA')(produced))
+========
+movie  
+===============
+001     
+003   *   
+
+π_(movie)(𝛔_(country<>'FRA')(produced))
+========
+movie 
+===============
+001     
+002    
+
+
+Appunti lezione del 20260311
+============================
+
+operatori binari dell'algebra relazionale: prodotto cartesiano e join   
+
+Consideriamo due relazioni R(X) e S(Y) 
+assumiamo X∩Y = ∅
+
+Esempio su imdb:
+R- movie(id, title, year, ...)
+S- genre(movie, genre)
+
+Il prodotto cartesiano RxS consiste nella combinazione di ciascun record di R con ciascun record di S
+
+R
+A   | B  | C
+===============
+a1   b1    c1 
+a2   b1    c1
+a1   b2    c3 
+
+S 
+D  |  E 
+======== 
+d1    e1
+d2    e2
+
+RxS
+A   | B   | C   | D   | E 
+=============================
+a1   b1    c1     d1    e1
+a1   b1    c1     d2    e2
+a2   b1    c1     d1    e1
+a2   b1    c1     d2    e2  
+a1   b2    c3     d1    e1
+a1   b2    c3     d2    e2
+
+
+movie
+=====
+id  | title     | year 
+===============================
+001   movie1     2012
+002   movie2     2010
+003   movie3     2010
+
+
+genre
+======
+movie   |  genre
+================
+001         thriller
+002         Comedy
+
+
+movie x genre
+=============
+id  | title     | year  | movie  | genre
+========================================
+001   movie1     2012     001      thriller
+001   movie1     2012     002      comedy    ** non significativa
+002   movie2     2010     001      thriller  ** non significativa
+002   movie2     2010     002      comedy
+003   movie3     2010     001      thriller  ** non significativa
+003   movie3     2010     002      comedy    ** non significativa
+
+L'operazione di join consiste in un filtro sul prodotto cartesiano dove viene verificata la condizione di selezione di interesse
+
+per trovare i film con i corrispondenti generi uso la seguente espressione di algebra relazionale:
+
+𝛔_(movie=id)(movie x genre)
+
+Questa operazione di selezione sul prodotto cartesiano prende il nome di theta join e ha una propria sintassi:
+R ⋈_Θ S
+
+il simbolo Θ (theta) denota la condizione di join, cioè il criterio di confronto con il quale valutare i record di RxS
+
+quando theta è un'operazione di uguaglianza parliamo di equijoin 
+R ⋈_(A=B) S
+
+esempio su imdb:
+movie ⋈_(id=movie) genre 
+
+
+- trovare il titolo dei film prodotti in Italia
+produced(movie, country)
+movie(id, title, year)
+
+π_(id,title)(𝛔_(country='ITA')(movie ⋈_(id=movie) produced))
+
+
+movie
+=====
+id  | title     | year 
+===============================
+001   movie1     2012
+002   movie2     2010
+003   movie3     2010
+
+produced 
+========
+movie   | country
+=================
+001       USA
+001       ITA
+002       ITA
+003       FRA 
+
+movie ⋈_(id=movie) produced
+===========================
+id  | title     | year  |  movie    | country 
+==============================================
+001   movie1     2012      001        USA
+001   movie1     2012      001        ITA   *
+002   movie2     2010      002        ITA   *
+003   movie3     2010      003        FRA
+
+π_(id,title)(𝛔_(country='ITA')(movie ⋈_(id=movie) produced))
+==============
+id  | title 
+==============
+001   movie1
+002   movie2
+
+restituire il titolo delle pellicole con valutazioni > 8 su scala 10
+rating(movie, check_date, source, votes, scale, grade)
+
+π_(id,title)(𝛔_(scale=10 ∧ grade>8)(movie ⋈_(id=movie) rating))
+
+
+restituire il titolo dei film dove recita Leonardo Di Caprio
+person(id, given_name, ...)
+crew(person, movie, role, character)
+movie(id, title, ...)
+
+π_(movie.id,title)(𝛔_(given_name='Leo di Caprio' ∧ role ='actor')
+( (𝛒(pid<-id)person) ⋈_(pid=person) (movie ⋈_(movie.id=movie) crew)))
+
+join naturale è un equijoin dove sono coinvolti gli attributi con lo stesso nome nelle relazioni R,S.
+Il join naturale si applica a relazioni con schema non disgiunto. Consideriamo:
+R(XZ)
+S(ZY)
+XZ∩ZY = Z 
+R⋈S(XZY)
+
+Il join naturale R ⋈ S avrà grado pari a grado(R) + grado(S) - grado(Z). 
+
+movie(id, title, year)
+crew (person, movie, role, character)
+
+rinomino l'attributo crew.movie: 𝛒(id<-movie)crew
+
+ora le relazioni movie, crew hanno un attributo comune e posso applicare il join naturale:
+(movie ⋈ (𝛒(id<-movie)crew))
+
+L'attributo id presente in entrambe le relazioni figura una volta sola nello schema risultato
+
+(movie ⋈ (𝛒(id<-movie)crew)) -> schema della relazione risultato: id, title, year, person, role, character
+
+Trovare il titolo dei film realizzati in anni successivi a quello di Django
+
+movie
+=====
+id  | title             | year 
+===============================
+001   Django                2012
+002   Shutter Island        2010
+003   Batman                2014
+
+Vediamo una soluziona basata su self-join (join che coinvolge un'unica tabella)
+
+movie x movie 
+movie
+=====
+id  | title             | year   | id  | title             | year 
+==================================================================
+001   Django                2012    001   Django                2012 
+001   Django                2012    002   Shutter Island        2010  
+001   Django                2012    003   Batman                2014 *
+002   Shutter Island        2010    001   Django                2012 
+002   Shutter Island        2010    002   Shutter Island        2010 
+002   Shutter Island        2010    003   Batman                2014
+003   Batman                2014    001   Django                2012
+003   Batman                2014    002   Shutter Island        2010
+003   Batman                2014    003   Batman                2014
+
+movie_a = movie 
+movie_b = movie 
+
+π(movie_b.id,movie_b.title)(𝛔_(movie_b.year>movie_a.year)(𝛔_(movie_a.title='Django')(movie_a x movie_b)))
+
+soluzione alternativa:
+π(movie_b.title)(movie_a ⋈_(movie_b.year>movie_a.year ∧ movie_a.title='Django') movie_b) 
+
+nel caso ci siano più film che hanno titolo Django la query restituisce i film successivi alla prima versione di Django (al film con year meno recente)
+
+trovare l'espressione di algebra che restituisce solo i film più recenti rispetto all'ultima versione di Django.
+
+movie
+=====
+id  | title             | year 
+===============================
+001   Django                2012
+002   Shutter Island        2010
+003   Batman                2014
+004   Django                2013
+
+movie x movie 
+movie
+=====
+id  | title             | year   | id  | title             | year 
+==================================================================
+001   Django                2012    001   Django                2012 
+001   Django                2012    002   Shutter Island        2010  
+001   Django                2012    003   Batman                2014 *
+001   Django                2012    004   Django                2013 *
+002   Shutter Island        2010    001   Django                2012 
+002   Shutter Island        2010    002   Shutter Island        2010 
+002   Shutter Island        2010    003   Batman                2014
+002   Shutter Island        2010    004   Django                2013 
+003   Batman                2014    001   Django                2012
+003   Batman                2014    002   Shutter Island        2010
+003   Batman                2014    003   Batman                2014
+003   Batman                2014    004   Django                2013
+004   Django                2013    001   Django                2012 
+004   Django                2013    002   Shutter Island        2010 
+004   Django                2013    003   Batman                2014 *
+004   Django                2013    004   Django                2013 
+
+possibile soluzione:
+D = 𝛔_(title='Django')movie
+D' = D 
+DR = (π_(id)D) - (π_(D.id)(D ⋈_(D.year<D'.year) D'))
+DRC = movie ⋈_(movie.id=DR.id) DR
+Ris = π(movie.id,title)(movie ⋈_(movie.year>DRC.year) DRC) 
+
+La relazione DR contiene solo la versione più recente di Django. All'insieme di film Django (D) tolgo i film di Django che sono più vecchi di almeno un'altra versione.
+
+DxD'
+=====
+id  | title             | year   | id  | title             | year 
+==================================================================
+001   Django                2012    001   Django                2012
+001   Django                2012    004   Django                2013 *
+001   Django                2012    005   Django                2014 *
+004   Django                2013    001   Django                2012 
+004   Django                2013    004   Django                2013 
+004   Django                2013    005   Django                2014 *
+005   Django                2014    001   Django                2012 
+005   Django                2014    004   Django                2013 
+005   Django                2014    005   Django                2014
+
+
+Soluzione alternativa con divisione:
+D = 𝛔_(title='Django')movie
+Y = π_(year) D
+D' = D
+RISULTATO = π_(D.id, D.title)((π_(D.id, D.title,D.yearD,D'year)(𝝆(yearD <- D.year)(D ⋈_(D.year >= D'.year) D'))) ÷ Y)
+
+DxD' (in asterisco i record che soddisfano D.year >= D'.year)
+=====
+id  | title             | year   | id  | title             | year 
+==================================================================
+001   Django                2012    001   Django                2012 *
+001   Django                2012    004   Django                2013 
+001   Django                2012    005   Django                2014
+004   Django                2013    001   Django                2012 * 
+004   Django                2013    004   Django                2013 *
+004   Django                2013    005   Django                2014 
+005   Django                2014    001   Django                2012 *
+005   Django                2014    004   Django                2013 *
+005   Django                2014    005   Django                2014 *
+
+(π_(D.id, D.title,D.yearD,D'year)(𝝆(yearD <- D.year)(D ⋈_(D.year >= D'.year) D'))) ÷ Y
+=====
+id  | title             | yearD   | year 
+==================================================================
+005   Django               2014     2012 *
+005   Django               2014     2013 *
+005   Django               2014     2014 *
+
+
+Trovare i film che sono sia Thriller sia Comedy 
+genre
+=====
+movie | genre
+=============
+001     Thriller *
+002     Thriller
+001     Comedy *
+003     Comedy
+003     Drama
+
+soluzione con join?
+
+mt = genre
+mc = genre
+
+π_(mt.movie)(𝛔_(mt.movie=mc.movie)(𝛔_(mc.genre='Comedy')(𝛔_(mt.genre='Thriller')(mt x mc))))
+
+π_(mt.movie)(𝛔_(mc.genre='Comedy')(𝛔_(mt.genre='Thriller')(mt ⋈_(mt.movie=mc.movie) mc)))
+
+efficienza: 
+applicare le selezioni alla relazione più ristretta possibile 
+
+mc = π_(movie)(𝛔_(genre='Comedy') genre)
+mt = π_(movie)(𝛔_(genre='Thriller') genre)
+risultato: mt ⋈ mc
+
+mt
+=====
+movie | genre
+=============
+001     Thriller 
+002     Thriller
+
+mc
+=====
+movie | genre
+=============
+001     Comedy 
+003     Comedy
+
+
+
+
+movie | genre       | movie | genre
+=============================
+001     Thriller     001     Thriller  
+001     Thriller     002     Thriller
+001     Thriller     001     Comedy *
+001     Thriller     003     Comedy 
+001     Thriller     003     Drama
+002     Thriller     001     Thriller
+002     Thriller     002     Thriller
+002     Thriller     001     Comedy 
+002     Thriller     003     Comedy 
+002     Thriller     003     Drama
+...(il prodotto cartesiano contiene 25 record)
+
+
+Consideriamo il seguente caso: 
+
+movie
+=====
+id  | title             | year 
+===============================
+001   Django                2012
+002   Shutter Island        2010
+003   Batman                2014
+
+genre
+=====
+movie | genre
+=============
+001     Thriller 
+002     Thriller
+001     Comedy 
+
+movie ⋈_(movie=id) genre
+
+E' possibile che ci siano record di una relazione partecipante al join che non figurano nel risultato del join (batman nel caso dell'esempio). I record di questo tipo sono detti dangling. 
+
+
+Operatore di divisione 
+
+Voglio trovare i film che sono associati a tutti i generi disponibili 
+
+genre_list 
+============
+id  |  name
+============
+A       Thriller
+B       Drama
+C       Comedy 
+
+
+genre
+=====
+movie | genre
+=============
+001     A 
+002     A
+001     C 
+001     B
+003     B 
+003     C 
+003     A  
+
+Definiamo formalmente la divisione: 
+R(XZ)
+S(Z)
+
+R ÷ S -> produce una relazione il cui schema è definito su X 
+
+condizione necessaria: l'insieme degli attributi di S deve essere un sottoinsieme proprio degli attributi di R affinchè l'operatore di divisione sia applicabile 
+
+R ÷ S = { t1 su X | ∀ t2∈S, ∃ t∈R con t[X]=t1 ∧ t[Z]=t2 }
+
+genre_list (S)
+============
+id  |  name
+============
+A       Thriller
+B       Drama
+C       Comedy 
+
+
+R = genre 
+=====
+movie | genre
+=============
+001     A 
+002     A
+001     C 
+001     B
+003     B 
+003     C 
+003     A  
+
+genre ÷ (𝝆(genre<-id)(π_(id)genre_list))
+
+
+S = (𝝆(genre<-id)(π_(id)genre_list))
+============
+genre 
+============
+A       
+B       
+C  
+
+R ÷ S 
+======
+movie
+====== 
+001
+003 
+
+
+
+in un db accademico abbiamo la seguente situazione:
+
+corsi(nome, titolare) - PK(nome,titolare)
+esami_superati(studente, voto, corso, docente) PK(studente, corso, docente)
+
+chiave esterna
+esami_superati(corso,docente) -> corsi(nome,titolare)
+
+
+voglio trovare gli studenti che hanno superato tutti i corsi 
+
+(π(student, corso, docente)esami_superati) ÷ (𝝆(corso<-nome, docente<-titolare) corsi)
+
+
+corsi
+=====
+nome, titolare
+===============
+c1      p1
+c2      p2 
+
+esami_superati
+===============
+studente, corso, docente
+===============================
+S1          c1      p1
+S2          c1      p1
+S2          c2      p2 
+
+
+(π(student, corso, docente)esami_superati) ÷ (𝝆(corso<-nome, docente<-titolare) corsi)
+==========================
+student
+==============
+S2         
+
+
+Appunti lezione del 20260312
+============================
+
+Consideriamo lo schema relazionale delle esercitazioni
+continent(id, name) - PK(continent.id)
+country(id, name, continent, currency) - PK(country.id) - FK(country.continent -> continent.id)
+city(id, name, country, population) - PK(city.id) - FK(city.country -> country.id)
+politician(id, name, birth_place, gender, birth_date, party) - PK(politician.id) - FK(politician.birth_place -> country.id)
+govern(city, head, election_year) - PK(govern.city,govern.head,govern.election_year) - FK(govern.city -> city.id, govern.head -> politician.id)
+country_borders(country_a, country_b) - PK(country_a, country_b) - FK(country_a -> country.id, country_b -> country.id)
+
+1. Trovare il nome delle città in cui non è utilizzato il dollaro come moneta (currency)
+
+π_(city.id, city.name)(𝛔_(currency<>'$')(city ⋈_(country=country.id) country) )
+
+ottimizzata:
+A = π_(id)(𝛔_(currency<>'$')country)
+Ris = π_(city.id, name)(city ⋈_(country=A.id) A)
+
+2. Trovare il nome dei politici che non hanno governato città con più di 500K abitanti
+
+A = govern ⋈_(govern.city=id) (π_(id)(𝛔_(population>500K)city))
+B = (π_(id)politician) - (π_(head)A) 
+Ris = π_(B.id,name)(politician ⋈_(B.id=politician.id) B)
+
+
+la seguente espressione NON è equivalente. Il join da solo non è in grado di escludere i politici che hanno governato sia città con più di 500K abitanti sia città con meno di 500K abitanti
+govern ⋈_(govern.city=id) (π_(id)(𝛔_(population<=500K)city))
+
+govern ⋈_(govern.city=id) city 
+===============================
+head  |  city |  city.id    | population
+ABC      001      001            560K
+ABC      002      002            230K 
+
+3. Trovare paesi europei che non confinano con l’Italia
+
+IT = π_(country.id)(σ_(name=Italy)country)  
+EU = π_(country.id​)((σ_(continent.name=′Europe′)continent) ⋈_(continent.id=country.continent) ​country)
+
+IT_BORDERS = 
+(π_(country_b)​(country_borders ⋈_(IT.id=country_a) IT))
+∪
+(π_(country_a)​(country_borders ⋈_(IT.id=country_b) IT))
+
+RISULTATO = EU - IT_BORDERS
+

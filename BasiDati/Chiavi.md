@@ -1,8 +1,10 @@
 - **Superchiave**: 
-  Insieme di attributi che permette di identifica univocamente un record _(Non esistono due record con la medesima superchiave)_. Può essere Null.
+  Insieme di attributi che permette di identifica univocamente un record _(Non esistono due record con la medesima superchiave)_. Alcuni attributi che compongono la superchiave possono essere Null.
 	
 - **Superchiave Minimale (Chiave)**: 
-  Uno dei più piccoli insiemi di attributi che permette di identificare univocamente un record _(Non esistono due record con la medesima superchiave)_. Può essere Null.
+  Uno dei più piccoli insiemi di attributi che permette di identificare univocamente un record _(Non esistono due record con la medesima superchiave)_.
+  L'insieme degli attributi soddisfano il vincolo UNIQUE
+  Gli attributi possono essere null
 	- **Attributo Primo**:
 	  Appartiene ad una **Superchiave minimale**
 
